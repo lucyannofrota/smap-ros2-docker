@@ -4,7 +4,7 @@
 # Example:
 ############
 repositories:
-  examples:
-    type: git
-    url: https://github.com/ros2/examples.git
-    version: foxy
+#   examples:
+#     type: git
+#     url: https://github.com/ros2/examples.git
+#     version: foxy
