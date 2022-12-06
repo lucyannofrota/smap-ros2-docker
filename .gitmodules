@@ -1,0 +1,3 @@
+[submodule "src/semantic_mapping"]
+	path = src/semantic_mapping
+	url = https://github.com/lucyannofrota/semantic_mapping.git
