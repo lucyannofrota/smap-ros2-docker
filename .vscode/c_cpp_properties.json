@@ -4,14 +4,15 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/opt/ros/foxy/include/**"
+                "/opt/ros/foxy/include/**",
+                "${workspaceFolder}/src/semantic_mapping"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
-            // "compileCommands": "${workspaceFolder}/build/compile_commands.json",
             "cStandard": "c99",
             "cppStandard": "c++14",
-            "intelliSenseMode": "linux-gcc-x64"
+            "intelliSenseMode": "linux-gcc-x64",
+            "compileCommands": "${workspaceFolder}/build/compile_commands.json"
         }
     ],
     "version": 4

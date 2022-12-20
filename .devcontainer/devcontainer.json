@@ -1,5 +1,6 @@
 // See https://aka.ms/vscode-remote/devcontainer.json for format details.
 {
+	"name": "foxy-cuda-gazebo-nvidia",
 	"dockerFile": "Dockerfile",
 	"build": {
 		"args": {
@@ -38,6 +39,9 @@
 		"streetsidesoftware.code-spell-checker",
 		"twxs.cmake",
 		"yzhang.markdown-all-in-one",
-		"zachflower.uncrustify"
+		"zachflower.uncrustify",
+		"Gruntfuggly.todo-tree",
+		"esbenp.prettier-vscode",
+		"austin.code-gnu-global"
 	]
 }
