@@ -13,7 +13,11 @@ colcon build \
         --symlink-install \
         --cmake-args "-DCMAKE_BUILD_TYPE=$BUILD_TYPE" "-DCMAKE_EXPORT_COMPILE_COMMANDS=On" \
         -Wall -Wextra -Wpedantic
+. install/setup.bash
 cd ../../
 sudo apt-get update
 rosdep update
 rosdep install --from-paths src --ignore-src -y
+cd /
+echo "export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:/workspaces/Semantic-Mapping-ROS2-Containers/src/turtlebot3/turtlebot3/turtlebot3_simulations/turtlebot3_gazebo/models" >> ~/.bashrc
+source ~/.bashrc

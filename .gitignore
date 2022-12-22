@@ -6,3 +6,5 @@ site/*
 src/*
 !src/ros2.repos
 src/temp
+
+delete.devcontainer/
