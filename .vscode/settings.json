@@ -74,7 +74,9 @@
         "typeinfo": "cpp",
         "valarray": "cpp",
         "variant": "cpp",
-        "*.ipp": "cpp"
+        "*.ipp": "cpp",
+        "any": "cpp",
+        "regex": "cpp"
     },
     "python.analysis.extraPaths": [
         "/opt/ros/foxy/lib/python3.8/site-packages/"
@@ -107,6 +109,7 @@
     "cSpell.words": [
         "athackst",
         "autopep",
+        "bringup",
         "cmake",
         "cppcheck",
         "cpplint",
@@ -125,6 +128,8 @@
         "rosdistro",
         "rosidl",
         "RTPS",
+        "rviz",
+        "SMAP",
         "Topo",
         "TOPOLOGIC",
         "Tpng",

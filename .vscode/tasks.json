@@ -19,7 +19,8 @@
             "label": "build and run",
             "detail": "Build workspace and Run",
             "type": "shell",
-            "command": "./build.sh && ros2 run semantic_mapping semantic_mapping_node",
+            "command": "./build.sh && ./run.sh",
+            // ros2 run semantic_mapping semantic_mapping_node --ros-args --log-level DEBUG",
             "group": {
                 "kind": "build",
                 "isDefault": true

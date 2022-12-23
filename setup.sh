@@ -19,5 +19,6 @@ sudo apt-get update
 rosdep update
 rosdep install --from-paths src --ignore-src -y
 cd /
-echo "export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:/workspaces/Semantic-Mapping-ROS2-Containers/src/turtlebot3/turtlebot3/turtlebot3_simulations/turtlebot3_gazebo/models" >> ~/.bashrc
+
+
 source ~/.bashrc
