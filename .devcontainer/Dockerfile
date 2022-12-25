@@ -36,7 +36,13 @@ RUN apt-get update \
 	&& echo "export RCUTILS_COLORIZED_OUTPUT=1"  >> /home/$USERNAME/.bashrc \
 	&& echo "export RCUTILS_COLORIZED_OUTPUT=1"  >> /home/$USERNAME/.bashrc \
 	&& echo "# export RCUTILS_CONSOLE_OUTPUT_FORMAT=\"[{severity}] [{name}]: {message} ({function_name}() at {file_name}:{line_number}) [{time}]\""  >> /home/$USERNAME/.bashrc \
-	&& echo "# export RCUTILS_CONSOLE_OUTPUT_FORMAT=\"[{severity}] [{name}]: {message}\""  >> /home/$USERNAME/.bashrc
+	&& echo "# export RCUTILS_CONSOLE_OUTPUT_FORMAT=\"[{severity}] [{name}]: {message}\""  >> /home/$USERNAME/.bashrc \
+	&& mkdir /home/$USERNAME/.gazebo \
+	&& echo "[geometry]"  >> /home/$USERNAME/.gazebo/gui.ini \
+	&& echo "x=72"  >> /home/$USERNAME/.gazebo/gui.ini \
+	&& echo "y=500"  >> /home/$USERNAME/.gazebo/gui.ini \
+	&& echo "width=883"  >> /home/$USERNAME/.gazebo/gui.ini \
+	&& echo "height=584"  >> /home/$USERNAME/.gazebo/gui.ini
 
 	#
 	# Clean up
