@@ -62,6 +62,7 @@
 		"zachflower.uncrustify",
 		"Gruntfuggly.todo-tree",
 		"esbenp.prettier-vscode",
-		"austin.code-gnu-global"
+		"austin.code-gnu-global",
+		"nonanonno.vscode-ros2"
 	]
 }

@@ -1,20 +1,20 @@
 # List of repositories to use within your workspace
 # See https://github.com/dirk-thomas/vcstool
-############ 
-# Example:
-############
+
 repositories:
-  # examples:
-  #   type: git
-  #   url: https://github.com/ros2/examples.git
-  #   version: foxy
 
   turtlebot3:
     type: git
     url: https://github.com/ROBOTIS-GIT/turtlebot3
     version: foxy-devel
 
-  # SLAM_Toolbox:
-  #   type: git
-  #   url: https://github.com/SteveMacenski/slam_toolbox
-  #   version: foxy-devel
+  zed_wrapper:
+    type: git
+    url: https://github.com/stereolabs/zed-ros2-wrapper
+    version: master
+
+  zed_wrapper/zed-ros2-interfaces:
+    type: git
+    url: https://github.com/stereolabs/zed-ros2-interfaces.git
+    version: main
+
