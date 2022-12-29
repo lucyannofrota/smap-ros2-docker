@@ -38,11 +38,5 @@ RUN apt-get update \
 	&& echo "# export RCUTILS_CONSOLE_OUTPUT_FORMAT=\"[{severity}] [{name}]: {message} ({function_name}() at {file_name}:{line_number}) [{time}]\""  >> /home/$USERNAME/.bashrc \
 	&& echo "# export RCUTILS_CONSOLE_OUTPUT_FORMAT=\"[{severity}] [{name}]: {message}\""  >> /home/$USERNAME/.bashrc
 
-	#
-	# Clean up
-	#    && apt-get autoremove -y \
-	#    && apt-get clean -y \
-	#    && rm -rf /var/lib/apt/lists/*
-
 ENV DEBIAN_FRONTEND=dialog
 

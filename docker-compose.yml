@@ -28,3 +28,10 @@ services:
     cap_add:
       - SYS_PTRACE
     command: sleep infinity
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+
