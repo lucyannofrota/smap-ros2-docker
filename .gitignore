@@ -8,3 +8,5 @@ src/*
 src/temp
 
 delete.devcontainer/
+
+ZED_SDK_Linux_Ubuntu20.run

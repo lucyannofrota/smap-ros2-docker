@@ -6,7 +6,7 @@ services:
   ros2-cuda:
     user: "ros"
     network_mode: "host"
-    image: ros2-full-cuda-opengl-gazebo
+    image: ros2-full-cuda-opengl-gazebo-zed
     container_name: ros2-semantic-mapping
     build:
       network: host
@@ -21,9 +21,9 @@ services:
       - "DISPLAY"
       - "QT_X11_NO_MITSHM=1" #fix some QT bugs
     volumes: 
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw # Share X11 socket with container
-      - $HOME/.Xauthority:/home/ros/.Xauthority:rw # Share X11 permissions
-      - $PWD/dev:/home/ros/dev:rw
+      - /tmp/.X11-unix:/tmp/.X11-unix # Share X11 socket with container
+      - $HOME/.Xauthority:/home/ros/.Xauthority # Share X11 permissions
+      # - $PWD/dev:/home/ros/dev
       - ./:/workspaces/Semantic-Mapping-ROS2-Containers/:cached
     cap_add:
       - SYS_PTRACE
