@@ -18,10 +18,14 @@ vcs import < src/ros2.repos src
 # echo Builing zed_wrapper
 # cd ../../
 
+source /opt/ros/foxy/setup.bash
+
+BUILD_TYPE=RelWithDebInfo
+# RelWithDebInfo
 colcon build \
         --merge-install \
         --symlink-install \
-        --cmake-args "-DCMAKE_BUILD_TYPE=RelWithDebInfo" "-DCMAKE_EXPORT_COMPILE_COMMANDS=On" \
+        --cmake-args "-DCMAKE_BUILD_TYPE=$BUILD_TYPE" "-DCMAKE_EXPORT_COMPILE_COMMANDS=On" \
         -Wall -Wextra -Wpedantic
 . install/setup.bash
 

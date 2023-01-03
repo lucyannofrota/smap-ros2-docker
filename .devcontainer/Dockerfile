@@ -1,20 +1,11 @@
 ##############################################
-# Based on https://github.com/stereolabs/zed-docker/blob/master/3.X/ubuntu/gl-devel/Dockerfile
-##############################################
-
-FROM nvidia/cudagl:11.4.2-runtime-ubuntu20.04 as cudagl
-
-##############################################
-# Based on https://github.com/athackst/dockerfiles/blob/main/ros2/foxy-cuda.Dockerfile
+# Created from template ros2.dockerfile.jinja
 ##############################################
 
 ###########################################
 # Base image 
 ###########################################
-# FROM nvidia/cuda:11.7.0-runtime-ubuntu20.04 AS base
-# FROM cudagl as setup-base
-# FROM zed-api as setup-base
-FROM cudagl as setup-base
+FROM nvidia/cuda:11.7.0-devel-ubuntu20.04 AS base
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -60,7 +51,7 @@ ENV DEBIAN_FRONTEND=
 ###########################################
 #  Develop image 
 ###########################################
-FROM setup-base AS dev
+FROM base AS dev
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
@@ -164,6 +155,8 @@ ENV NVIDIA_VISIBLE_DEVICES all
 ENV QT_X11_NO_MITSHM 1
 
 
+
+
 ###########################################
 #  Full+Gazebo+Nvidia+ZED-sdk image 
 ###########################################
@@ -175,32 +168,48 @@ ENV NVIDIA_DRIVER_CAPABILITIES \
 
 RUN echo "Europe/Paris" > /etc/localtime ; echo "CUDA Version 11.7" > /usr/local/cuda/version.txt
 
-# Setup the ZED SDK
 USER ros
 ENV USER=ros
+# Install zstd
+RUN sudo apt-get update -y || true
+RUN sudo apt-get install --no-install-recommends zstd
+
+# Setup the ZED SDK
 RUN sudo apt-get update -y || true
 RUN sudo apt-get install --no-install-recommends lsb-release wget less udev sudo build-essential cmake -y
-RUN sudo wget -q -O ZED_SDK_Linux_Ubuntu20.run https://download.stereolabs.com/zedsdk/3.7/cu117/ubuntu20
-RUN sudo chmod +x ZED_SDK_Linux_Ubuntu20.run
+RUN sudo wget -q -O ZED_SDK_38_Linux_Ubuntu20.run https://download.stereolabs.com/zedsdk/3.8/cu117/ubuntu20
+RUN sudo chmod +x ZED_SDK_38_Linux_Ubuntu20.run
 
-RUN ./ZED_SDK_Linux_Ubuntu20.run -- silent
+RUN ./ZED_SDK_38_Linux_Ubuntu20.run -- silent
 
 RUN sudo ln -sf /lib/x86_64-linux-gnu/libusb-1.0.so.0 /usr/lib/x86_64-linux-gnu/libusb-1.0.so \ 
-    && sudo rm ZED_SDK_Linux_Ubuntu20.run \
+    && sudo rm ZED_SDK_38_Linux_Ubuntu20.run \
     && sudo rm -rf /var/lib/apt/lists/*
 
 FROM zed-sdk as zed-api
 
+# USER ros
+# ENV USER=ros
+
 # # ZED Python API
-RUN apt-get update -y || true
-RUN apt-get install --no-install-recommends python3 python3-pip libpng-dev libgomp1 -y && \ 
+RUN sudo apt-get update -y || true
+RUN sudo apt-get install --no-install-recommends python3 python3-pip libpng-dev libgomp1 -y && \ 
     wget download.stereolabs.com/zedsdk/pyzed -O /usr/local/zed/get_python_api.py && \
     python3 /usr/local/zed/get_python_api.py && \
     python3 -m pip install numpy opencv-python pyopengl *.whl && \
-    rm *.whl ; rm -rf /var/lib/apt/lists/*
+    sudo rm *.whl ; sudo rm -rf /var/lib/apt/lists/*
 
 # # Make some tools happy
 RUN sudo mkdir -p /root/Documents/ZED/
+
+# ROS diagnostic_updater
+RUN sudo apt-get update -y || true
+RUN sudo apt-get install --no-install-recommends \
+    ros-foxy-diagnostic-updater
+
+##########################################
+#  Full+Gazebo+Nvidia+ZED-sdk+turtlebot image 
+##########################################
 
 FROM zed-api as turtlebot
 
@@ -232,13 +241,3 @@ RUN sudo apt-get update \
 	&& echo "# export RCUTILS_CONSOLE_OUTPUT_FORMAT=\"[{severity}] [{name}]: {message}\""  >> /home/$USERNAME/.bashrc
 
 ENV DEBIAN_FRONTEND=dialog
-
-# FROM turtlebot as setup-cuda
-
-# ENV DEBIAN_FRONTEND=noninteractive
-
-# # RUN echo "export PATH=$PATH:/usr/local/cuda/bin" >> /home/$USERNAME/.bashrc \
-# #   && echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib:/usr/local/lib" >> /home/$USERNAME/.bashrc \
-# #   && echo "export CPLUS_INCLUDE_PATH=/usr/local/cuda/include" >> /home/$USERNAME/.bashrc
-
-# ENV DEBIAN_FRONTEND=dialog

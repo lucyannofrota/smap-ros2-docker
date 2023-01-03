@@ -6,7 +6,7 @@ services:
   ros2-cuda:
     user: "ros"
     network_mode: "host"
-    image: ros2-full-cuda-opengl-gazebo-zed
+    image: ros2-full-cuda-gazebo-zed-turtlebot
     container_name: ros2-semantic-mapping
     build:
       network: host
