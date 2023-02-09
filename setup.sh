@@ -21,7 +21,6 @@ vcs import < src/ros2.repos src
 source /opt/ros/foxy/setup.bash
 
 BUILD_TYPE=RelWithDebInfo
-# RelWithDebInfo
 colcon build \
         --merge-install \
         --symlink-install \
@@ -32,5 +31,7 @@ colcon build \
 sudo apt-get update
 rosdep update
 rosdep install --from-paths src --ignore-src -y
+
+source /opt/ros/foxy/setup.bash
 # cd /
 

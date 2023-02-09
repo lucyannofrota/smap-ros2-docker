@@ -223,13 +223,14 @@ RUN echo "if [ -f ${WORKSPACE}/install/setup.bash ]; then source ${WORKSPACE}/in
 
 RUN sudo apt-get update \
 	&& sudo apt-get -y install --no-install-recommends \
-	sudo ros-foxy-gazebo-* \
-	sudo ros-foxy-cartographer \
-	sudo ros-foxy-cartographer-ros \
-	sudo ros-foxy-navigation2 \
-	sudo ros-foxy-nav2-bringup \
-	sudo ros-foxy-dynamixel-sdk \
-	sudo ros-foxy-turtlebot3* \
+	ros-foxy-gazebo-* \
+	ros-foxy-cartographer \
+	ros-foxy-cartographer-ros \
+	ros-foxy-navigation2 \
+	ros-foxy-nav2-bringup \
+	ros-foxy-dynamixel-sdk \
+	ros-foxy-turtlebot3* \
+  ros-foxy-pluginlib \
 	&& echo "export ROS_DOMAIN_ID=30 #TURTLEBOT3" >> /home/$USERNAME/.bashrc \
 	&& echo "export TURTLEBOT3_MODEL=burger" >> /home/$USERNAME/.bashrc \
 	&& echo "export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:/workspaces/Semantic-Mapping-ROS2-Containers/src/turtlebot3/turtlebot3/turtlebot3_simulations/turtlebot3_gazebo/models" >> /home/$USERNAME/.bashrc \

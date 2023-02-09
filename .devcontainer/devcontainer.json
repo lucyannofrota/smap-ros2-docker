@@ -48,6 +48,8 @@
 		"Gruntfuggly.todo-tree",
 		"esbenp.prettier-vscode",
 		"austin.code-gnu-global",
-		"nonanonno.vscode-ros2"
+		"nonanonno.vscode-ros2",
+		"twxs.cmake",
+		"ms-vscode.cmake-tools"
 	]
 }
