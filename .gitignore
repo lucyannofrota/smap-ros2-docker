@@ -3,5 +3,5 @@
 /lost+found
 /test_git
 installed_containers.md
-/containers/**
-/dustry-nv/**
+/containers/*
+/dustry-nv/*
