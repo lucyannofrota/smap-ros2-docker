@@ -10,3 +10,11 @@ src/temp
 delete.devcontainer/
 
 ZED_SDK_Linux_Ubuntu20.run
+
+test_listener.bash
+
+zed2_files
+
+scripts/zed2_run.bash
+
+zed2.log

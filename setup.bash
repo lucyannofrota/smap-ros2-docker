@@ -4,7 +4,7 @@ set -e
 vcs import < src/ros2.repos src
 vcs import < src/turtlebot3/turtlebot3.repos src
 vcs import < src/turtlebot3/turtlebot3_ci.repos src
-vcs import < src/semantic_mapping/semantic_mapping.repos src/semantic_mapping/src
+vcs import < src/semantic_mapping/semantic_mapping.repos src/semantic_mapping
 
 
 # vcs import < turtlebot3.repos
