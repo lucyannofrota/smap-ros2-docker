@@ -14,13 +14,14 @@ The general recommendation is to use the 'docker_run.sh' present inside 'dusty-n
 
 This script setup the container with GUI forwarding, GPU access, and user permissions.
 
-**The build time of each container is ~2 hours!**
+**The build time of each container is ~2 hours in the Jetson AGX Xavier!**
 
 ## Build / Test
 
 Build and Test instructions can be found in https://github.com/dusty-nv/jetson-containers.
 
-First execute the "Docker Default Runtime". \
+First execute the "Docker Default Runtime".
+
 **Don't skip the "Docker Default Runtime" step. It is mandatory to easily bypass gpu resources to containers!**
 
 
@@ -29,12 +30,13 @@ First execute the "Docker Default Runtime". \
 
 > `sudo ./dusty-nv/scripts/docker_run.sh --container ${container} --volume ${volume}`
 
---container -> specify the desired container \
+--container -> specify the desired container
+
 > --container `nvcr.io/nvidia/l4t-##:r##.#.#-py3`
 
 The references of the containers can be found in https://github.com/dusty-nv/jetson-containers.
 
---volume -> specify the folder to be attached to the container \
+--volume -> specify the folder to be attached to the container
 
 > --volume `/my/host/path:/my/container/path`
 

@@ -1,3 +1,3 @@
-[submodule "dustry-nv"]
-	path = dustry-nv
+[submodule "dusty-nv"]
+	path = dusty-nv
 	url = https://github.com/dusty-nv/jetson-containers.git
