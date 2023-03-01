@@ -5,7 +5,7 @@
 ###########################################
 # Base image 
 ###########################################
-FROM nvidia/cuda:11.7.0-devel-ubuntu20.04 AS base
+FROM nvidia/cuda:11.4.1-devel-ubuntu20.04 AS base
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -155,63 +155,11 @@ ENV NVIDIA_VISIBLE_DEVICES all
 ENV QT_X11_NO_MITSHM 1
 
 
-
-
-###########################################
-#  Full+Gazebo+Nvidia+ZED-sdk image 
-###########################################
-
-FROM gazebo-nvidia as zed-sdk
-
-ENV NVIDIA_DRIVER_CAPABILITIES \
-    ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}compute,video,utility,graphics
-
-RUN echo "Europe/Paris" > /etc/localtime ; echo "CUDA Version 11.7" > /usr/local/cuda/version.txt
-
-USER ros
-ENV USER=ros
-# Install zstd
-RUN sudo apt-get update -y || true
-RUN sudo apt-get install --no-install-recommends zstd
-
-# Setup the ZED SDK
-RUN sudo apt-get update -y || true
-RUN sudo apt-get install --no-install-recommends lsb-release wget less udev sudo build-essential cmake -y
-RUN sudo wget -q -O ZED_SDK_38_Linux_Ubuntu20.run https://download.stereolabs.com/zedsdk/3.8/cu117/ubuntu20
-RUN sudo chmod +x ZED_SDK_38_Linux_Ubuntu20.run
-
-RUN ./ZED_SDK_38_Linux_Ubuntu20.run -- silent
-
-RUN sudo ln -sf /lib/x86_64-linux-gnu/libusb-1.0.so.0 /usr/lib/x86_64-linux-gnu/libusb-1.0.so \ 
-    && sudo rm ZED_SDK_38_Linux_Ubuntu20.run \
-    && sudo rm -rf /var/lib/apt/lists/*
-
-FROM zed-sdk as zed-api
-
-# USER ros
-# ENV USER=ros
-
-# # ZED Python API
-RUN sudo apt-get update -y || true
-RUN sudo apt-get install --no-install-recommends python3 python3-pip libpng-dev libgomp1 -y && \ 
-    wget download.stereolabs.com/zedsdk/pyzed -O /usr/local/zed/get_python_api.py && \
-    python3 /usr/local/zed/get_python_api.py && \
-    python3 -m pip install numpy opencv-python pyopengl *.whl && \
-    sudo rm *.whl ; sudo rm -rf /var/lib/apt/lists/*
-
-# # Make some tools happy
-RUN sudo mkdir -p /root/Documents/ZED/
-
-# ROS diagnostic_updater
-RUN sudo apt-get update -y || true
-RUN sudo apt-get install --no-install-recommends \
-    ros-foxy-diagnostic-updater
-
 ##########################################
 #  Full+Gazebo+Nvidia+ZED-sdk+turtlebot image 
 ##########################################
 
-FROM zed-api as turtlebot
+FROM gazebo-nvidia as turtlebot
 
 # Turtlebot3
 ENV DEBIAN_FRONTEND=noninteractive

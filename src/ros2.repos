@@ -29,15 +29,15 @@ repositories:
 
 
   # Zed Camera
-  zed_wrapper:
-    type: git
-    url: https://github.com/stereolabs/zed-ros2-wrapper
-    version: master
+#  zed_wrapper:
+#    type: git
+#    url: https://github.com/stereolabs/zed-ros2-wrapper
+#    version: foxy-humble-v3.8
 
   zed_wrapper/zed-ros2-interfaces:
     type: git
     url: https://github.com/stereolabs/zed-ros2-interfaces.git
-    version: main
+    version: foxy-humble-v3.8
 
   # Semantic Mapping
   # semantic_mapping:
