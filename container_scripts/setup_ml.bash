@@ -1,3 +1,9 @@
 #!/bin/bash
 
-docker run -it --name ml --runtime nvidia --gpus all --network host -v /mnt/chopin_02/container_files/ml:/applications nvcr.io/nvidia/l4t-ml:r35.1.0-py3
+cd dusty-nv
+
+sudo ./scripts/docker_build_ros.sh -distro foxy --package desktop
+
+#sudo ./dusty-nv/scripts/docker_run.sh --container nvcr.io/nvidia/l4t-ml:r35.2.1-py3 --volume /container_files/ml:/application
+
+cd ..
