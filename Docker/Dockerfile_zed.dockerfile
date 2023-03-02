@@ -89,10 +89,9 @@ RUN apt-get update -y || true && \
   apt-get autoremove && apt-get clean
 
 # Install the ZED ROS2 Wrapper
-RUN mkdir /workspaces && mkdir /workspaces/zed && mkdir /workspaces/zed/src
-WORKDIR /workspaces/zed/src
+WORKDIR /root/ros2_ws/src
 RUN git clone --recursive https://github.com/stereolabs/zed-ros2-wrapper.git
-WORKDIR /workspaces/zed
+WORKDIR /root/ros2_ws
 
 RUN /bin/bash -c "source /opt/ros/$ROS_DISTRO/setup.bash && \
   rosdep install --from-paths src --ignore-src -r -y && \
@@ -106,6 +105,7 @@ RUN /bin/bash -c "source /opt/ros/$ROS_DISTRO/setup.bash && \
 # Change ROS FOXY DDS
 ARG DEBIAN_FRONTEND=noninteractive
 RUN sudo apt-get update -y && sudo apt install -y ros-foxy-rmw-cyclonedds-cpp
+ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 
 #CMD ["bash"]
 ENTRYPOINT []

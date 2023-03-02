@@ -1,7 +1,9 @@
 #!/bin/bash
 set -e
 
+sudo rm -r src/turtlebot3
 vcs import < src/ros2.repos src
+sudo sed -i '2,5d' src/turtlebot3/turtlebot3.repos
 vcs import < src/turtlebot3/turtlebot3.repos src
 vcs import < src/turtlebot3/turtlebot3_ci.repos src
 vcs import < src/semantic_mapping/semantic_mapping.repos src/semantic_mapping

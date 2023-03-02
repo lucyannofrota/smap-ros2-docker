@@ -5,7 +5,11 @@
 ###########################################
 # Base image 
 ###########################################
-FROM nvidia/cuda:11.4.1-devel-ubuntu20.04 AS base
+#FROM nvidia/cuda:11.4.1-devel-ubuntu20.04 AS base
+#FROM nvidia/cuda:11.7.0-devel-ubuntu20.04 AS base
+FROM nvidia/cudagl:11.4.2-devel-ubuntu20.04 AS base
+
+ENV ROS_DISTRO=foxy
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -34,16 +38,16 @@ RUN apt-get update && apt-get install -y \
   && curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg \
   && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null \
   && apt-get update && apt-get install -y \
-    ros-foxy-ros-base \
+    ros-${ROS_DISTRO}-ros-base \
     python3-argcomplete \
   && rm -rf /var/lib/apt/lists/*
 
-ENV ROS_DISTRO=foxy
-ENV AMENT_PREFIX_PATH=/opt/ros/foxy
-ENV COLCON_PREFIX_PATH=/opt/ros/foxy
-ENV LD_LIBRARY_PATH=/opt/ros/foxy/lib
-ENV PATH=/opt/ros/foxy/bin:$PATH
-ENV PYTHONPATH=/opt/ros/foxy/lib/python3.8/site-packages
+ENV ROS_DISTRO=${ROS_DISTRO}
+ENV AMENT_PREFIX_PATH=/opt/ros/${ROS_DISTRO}
+ENV COLCON_PREFIX_PATH=/opt/ros/${ROS_DISTRO}
+ENV LD_LIBRARY_PATH=/opt/ros/${ROS_DISTRO}/lib
+ENV PATH=/opt/ros/${ROS_DISTRO}/bin:$PATH
+ENV PYTHONPATH=/opt/ros/${ROS_DISTRO}/lib/python3.8/site-packages
 ENV ROS_PYTHON_VERSION=3
 ENV ROS_VERSION=2
 ENV DEBIAN_FRONTEND=
@@ -69,10 +73,10 @@ RUN apt-get update && apt-get install -y \
   vim \
   wget \
   # Install ros distro testing packages
-  ros-foxy-ament-lint \
-  ros-foxy-launch-testing \
-  ros-foxy-launch-testing-ament-cmake \
-  ros-foxy-launch-testing-ros \
+  ros-${ROS_DISTRO}-ament-lint \
+  ros-${ROS_DISTRO}-launch-testing \
+  ros-${ROS_DISTRO}-launch-testing-ament-cmake \
+  ros-${ROS_DISTRO}-launch-testing-ros \
   python3-autopep8 \
   && rm -rf /var/lib/apt/lists/* \
   && rosdep init || echo "rosdep already initialized" \
@@ -107,7 +111,7 @@ FROM dev AS full
 ENV DEBIAN_FRONTEND=noninteractive
 # Install the full release
 RUN apt-get update && apt-get install -y \
-  ros-foxy-desktop \
+  ros-${ROS_DISTRO}-desktop \
   && rm -rf /var/lib/apt/lists/*
 ENV DEBIAN_FRONTEND=
 
@@ -126,7 +130,7 @@ RUN apt-get update && apt-get install -q -y \
   && wget https://packages.osrfoundation.org/gazebo.gpg -O /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg \
   && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null \
   && apt-get update && apt-get install -q -y \
-    ros-foxy-gazebo* \
+    ros-${ROS_DISTRO}-gazebo* \
   && rm -rf /var/lib/apt/lists/*
 ENV DEBIAN_FRONTEND=
 
@@ -153,8 +157,6 @@ RUN apt-get update \
 ENV NVIDIA_VISIBLE_DEVICES all
 # ENV NVIDIA_DRIVER_CAPABILITIES graphics,utility,compute
 ENV QT_X11_NO_MITSHM 1
-
-
 ##########################################
 #  Full+Gazebo+Nvidia+ZED-sdk+turtlebot image 
 ##########################################
@@ -167,18 +169,18 @@ ENV DEBIAN_FRONTEND=noninteractive
 ARG USERNAME=ros
 # Set up auto-source of workspace for ros user
 ARG WORKSPACE="/workspaces/Semantic-Mapping-ROS2-Containers"
-RUN echo "if [ -f ${WORKSPACE}/install/setup.bash ]; then source ${WORKSPACE}/install/setup.bash; fi" >> /home/ros/.bashrc
+#RUN echo "if [ -f ${WORKSPACE}/install/setup.bash ]; then source ${WORKSPACE}/install/setup.bash; fi" >> /home/ros/.bashrc
 
 # RUN sudo apt-get update \
 # 	&& sudo apt-get -y install --no-install-recommends \
-# 	ros-foxy-gazebo-* \
-# 	ros-foxy-cartographer \
-# 	ros-foxy-cartographer-ros \
-# 	ros-foxy-navigation2 \
-# 	ros-foxy-nav2-bringup \
-# 	ros-foxy-dynamixel-sdk \
-# 	ros-foxy-turtlebot3* \
-#   ros-foxy-pluginlib \
+# 	ros-${ROS_DISTRO}-gazebo-* \
+# 	ros-${ROS_DISTRO}-cartographer \
+# 	ros-${ROS_DISTRO}-cartographer-ros \
+# 	ros-${ROS_DISTRO}-navigation2 \
+# 	ros-${ROS_DISTRO}-nav2-bringup \
+# 	ros-${ROS_DISTRO}-dynamixel-sdk \
+# 	ros-${ROS_DISTRO}-turtlebot3* \
+#   ros-${ROS_DISTRO}-pluginlib \
 # 	&& echo "export ROS_DOMAIN_ID=30 #TURTLEBOT3" >> /home/$USERNAME/.bashrc \
 # 	&& echo "export TURTLEBOT3_MODEL=burger" >> /home/$USERNAME/.bashrc \
 # 	&& echo "export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:/workspaces/Semantic-Mapping-ROS2-Containers/src/turtlebot3/turtlebot3/turtlebot3_simulations/turtlebot3_gazebo/models" >> /home/$USERNAME/.bashrc \
@@ -191,22 +193,41 @@ RUN echo "if [ -f ${WORKSPACE}/install/setup.bash ]; then source ${WORKSPACE}/in
 
 RUN sudo apt-get update
 RUN sudo apt-get -y install --no-install-recommends \
-  ros-foxy-gazebo-* \
-	ros-foxy-cartographer \
-	ros-foxy-cartographer-ros \
-	ros-foxy-navigation2 \
-	ros-foxy-nav2-bringup \
-	ros-foxy-dynamixel-sdk \
-	ros-foxy-turtlebot3*
+  ros-${ROS_DISTRO}-gazebo-* \
+	ros-${ROS_DISTRO}-cartographer \
+	ros-${ROS_DISTRO}-cartographer-ros \
+	ros-${ROS_DISTRO}-navigation2 \
+	ros-${ROS_DISTRO}-nav2-bringup \
+	ros-${ROS_DISTRO}-dynamixel-sdk \
+	ros-${ROS_DISTRO}-turtlebot3*
 RUN echo "export TURTLEBOT3_MODEL=burger" >> /home/$USERNAME/.bashrc \
 	&& echo "export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:/workspaces/Semantic-Mapping-ROS2-Containers/src/turtlebot3/turtlebot3/turtlebot3_simulations/turtlebot3_gazebo/models" >> /home/$USERNAME/.bashrc \
-	&& echo "export RCUTILS_LOGGING_USE_STDOUT=1" >> /home/$USERNAME/.bashrc \
-	&& echo "export RCUTILS_LOGGING_BUFFERED_STREAM=1"  >> /home/$USERNAME/.bashrc \
-	&& echo "export RCUTILS_COLORIZED_OUTPUT=1"  >> /home/$USERNAME/.bashrc \
-	&& echo "export RCUTILS_COLORIZED_OUTPUT=1"  >> /home/$USERNAME/.bashrc \
-	&& echo "# export RCUTILS_CONSOLE_OUTPUT_FORMAT=\"[{severity}] [{name}]: {message} ({function_name}() at {file_name}:{line_number}) [{time}]\""  >> /home/$USERNAME/.bashrc \
-	&& echo "# export RCUTILS_CONSOLE_OUTPUT_FORMAT=\"[{severity}] [{name}]: {message}\""  >> /home/$USERNAME/.bashrc
 
 
 #echo "export ROS_DOMAIN_ID=30 #TURTLEBOT3" >> /home/$USERNAME/.bashrc \
 ENV DEBIAN_FRONTEND=dialog
+
+FROM turtlebot as env_setup
+
+ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+
+# Install DDS
+ARG DEBIAN_FRONTEND=noninteractive
+RUN sudo apt-get update -y && sudo apt install -y ros-${ROS_DISTRO}-rmw-cyclonedds-cpp
+
+RUN mkdir -p ${WORKSPACE}
+WORKDIR ${WORKSPACE}
+
+
+RUN echo "export RCUTILS_LOGGING_USE_STDOUT=1" >> /home/$USERNAME/.bashrc \
+	&& echo "export RCUTILS_LOGGING_BUFFERED_STREAM=1"  >> /home/$USERNAME/.bashrc \
+	&& echo "export RCUTILS_COLORIZED_OUTPUT=1"  >> /home/$USERNAME/.bashrc \
+  && echo "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp"  >> /home/$USERNAME/.bashrc \
+	&& echo "# export RCUTILS_CONSOLE_OUTPUT_FORMAT=\"[{severity}] [{name}]: {message} ({function_name}() at {file_name}:{line_number}) [{time}]\""  >> /home/$USERNAME/.bashrc \
+	&& echo "# export RCUTILS_CONSOLE_OUTPUT_FORMAT=\"[{severity}] [{name}]: {message}\""  >> /home/$USERNAME/.bashrc
+
+#ENTRYPOINT [  ]
+#CMD ["sleep", "infinity"]
+#RUN cd ${WORKSPACE}
+#RUN cd ${WORKSPACE} && sudo ./setup.bash
+#RUN sudo ./build.bash

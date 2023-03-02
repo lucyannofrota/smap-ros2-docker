@@ -21,10 +21,7 @@ repositories:
   # utils/DynamixelSDK:
   #   type: git
   #   url: https://github.com/ROBOTIS-GIT/DynamixelSDK.git
-  #   version: foxy-devel
-  # utils/hls_lfcd_lds_driver:
-  #   type: git
-  #   url: https://github.com/ROBOTIS-GIT/hls_lfcd_lds_driver.git
+  #   version: foxy-develSemantic-Mapping-ROS2-Containers.com/ROBOTIS-GIT/hls_lfcd_lds_driver.git
   #   version: foxy-devel
 
 
@@ -34,17 +31,22 @@ repositories:
 #    url: https://github.com/stereolabs/zed-ros2-wrapper
 #    version: foxy-humble-v3.8
 
-  zed_wrapper/zed-ros2-interfaces:
+  zed-ros2-interfaces:
     type: git
     url: https://github.com/stereolabs/zed-ros2-interfaces.git
     version: foxy-humble-v3.8
 
   # Semantic Mapping
-  # semantic_mapping:
+  # smap:git config --global --add safe.directory /workspaces/Semantic-Mapping-ROS2-Containers/src/zed-ros2-interfaces
   #   type: git
-  #   url: https://github.com/lucyannofrota/semantic_mapping.git
+  #   url: https://github.com/lucyannofrota/smap.git
   #   version: main
   # classifier_wrapper:
   #   type: git
   #   url: https://github.com/lucyannofrota/Classifier-Wrapper.git
   #   version: main
+
+#  smap_interfaces:
+#    type: git
+#    url: https://github.com/stereolabs/zed-ros2-interfaces.git
+#    version: foxy-humble-v3.8
