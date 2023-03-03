@@ -21,7 +21,7 @@ repositories:
   # utils/DynamixelSDK:
   #   type: git
   #   url: https://github.com/ROBOTIS-GIT/DynamixelSDK.git
-  #   version: foxy-develSemantic-Mapping-ROS2-Containers.com/ROBOTIS-GIT/hls_lfcd_lds_driver.git
+  #   version: foxy-develsmap-ros2-containers.com/ROBOTIS-GIT/hls_lfcd_lds_driver.git
   #   version: foxy-devel
 
 
@@ -37,7 +37,7 @@ repositories:
     version: foxy-humble-v3.8
 
   # Semantic Mapping
-  # smap:git config --global --add safe.directory /workspaces/Semantic-Mapping-ROS2-Containers/src/zed-ros2-interfaces
+  # smap:git config --global --add safe.directory /workspaces/smap-ros2-containers/src/zed-ros2-interfaces
   #   type: git
   #   url: https://github.com/lucyannofrota/smap.git
   #   version: main

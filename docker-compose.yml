@@ -63,10 +63,10 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix # Share X11 socket with container
       - $HOME/.Xauthority:/home/ros/.Xauthority # Share X11 permissions
       # - $PWD/dev:/home/ros/dev
-      - ./:/workspaces/Semantic-Mapping-ROS2-Containers/:cached
+      - ./:/workspaces/smap-ros2-containers/:cached
     cap_add:
       - SYS_PTRACE
-    command: bash -c "sudo ./workspaces/Semantic-Mapping-ROS2-Containers/setup.bash ; ./workspaces/Semantic-Mapping-ROS2-Containers/build.bash ; tail -F /dev/null"
+    command: bash -c "sudo ./workspaces/smap-ros2-containers/setup.bash ; ./workspaces/smap-ros2-containers/build.bash ; tail -F /dev/null"
     deploy:
       resources:
         reservations:

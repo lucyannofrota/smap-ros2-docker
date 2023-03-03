@@ -168,7 +168,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 ARG USERNAME=ros
 # Set up auto-source of workspace for ros user
-ARG WORKSPACE="/workspaces/Semantic-Mapping-ROS2-Containers"
+ARG WORKSPACE="/workspaces/smap-ros2-containers"
 #RUN echo "if [ -f ${WORKSPACE}/install/setup.bash ]; then source ${WORKSPACE}/install/setup.bash; fi" >> /home/ros/.bashrc
 
 # RUN sudo apt-get update \
@@ -183,7 +183,7 @@ ARG WORKSPACE="/workspaces/Semantic-Mapping-ROS2-Containers"
 #   ros-${ROS_DISTRO}-pluginlib \
 # 	&& echo "export ROS_DOMAIN_ID=30 #TURTLEBOT3" >> /home/$USERNAME/.bashrc \
 # 	&& echo "export TURTLEBOT3_MODEL=burger" >> /home/$USERNAME/.bashrc \
-# 	&& echo "export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:/workspaces/Semantic-Mapping-ROS2-Containers/src/turtlebot3/turtlebot3/turtlebot3_simulations/turtlebot3_gazebo/models" >> /home/$USERNAME/.bashrc \
+# 	&& echo "export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:/workspaces/smap-ros2-containers/src/turtlebot3/turtlebot3/turtlebot3_simulations/turtlebot3_gazebo/models" >> /home/$USERNAME/.bashrc \
 # 	&& echo "export RCUTILS_LOGGING_USE_STDOUT=1" >> /home/$USERNAME/.bashrc \
 # 	&& echo "export RCUTILS_LOGGING_BUFFERED_STREAM=1"  >> /home/$USERNAME/.bashrc \
 # 	&& echo "export RCUTILS_COLORIZED_OUTPUT=1"  >> /home/$USERNAME/.bashrc \
@@ -201,7 +201,7 @@ RUN sudo apt-get -y install --no-install-recommends \
 	ros-${ROS_DISTRO}-dynamixel-sdk \
 	ros-${ROS_DISTRO}-turtlebot3*
 RUN echo "export TURTLEBOT3_MODEL=burger" >> /home/$USERNAME/.bashrc \
-	&& echo "export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:/workspaces/Semantic-Mapping-ROS2-Containers/src/turtlebot3/turtlebot3/turtlebot3_simulations/turtlebot3_gazebo/models" >> /home/$USERNAME/.bashrc \
+	&& echo "export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:/workspaces/smap-ros2-containers/src/turtlebot3/turtlebot3/turtlebot3_simulations/turtlebot3_gazebo/models" >> /home/$USERNAME/.bashrc \
 
 
 #echo "export ROS_DOMAIN_ID=30 #TURTLEBOT3" >> /home/$USERNAME/.bashrc \
