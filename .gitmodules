@@ -1,4 +1,8 @@
 # TODO: Enable modules
-#[submodule "smap"]
-#	path = src/smap
-#	url = https://github.com/lucyannofrota/smap.git
+[submodule "smap"]
+	path = src/smap
+	url = https://github.com/lucyannofrota/smap.git
+
+[submodule "p3dx_smap"]
+	path = src/p3dx_smap
+	url = https://github.com/lucyannofrota/p3dx_smap.git

@@ -10,7 +10,7 @@ sed -i '2,5d' src/turtlebot3/turtlebot3.repos
 vcs import < src/turtlebot3/turtlebot3.repos src
 vcs import < src/turtlebot3/turtlebot3_ci.repos src
 # TODO: Make the repositories public
-vcs import < src/smap/smap.repos src/smap
+#vcs import < src/smap/smap.repos src/smap
 
 
 
