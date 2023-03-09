@@ -16,10 +16,12 @@ BLACKLIST+=("dynamixel_sdk_examples")
 BLACKLIST+=("turtlebot3")
 BLACKLIST+=("turtlebot3_node")
 BLACKLIST+=("turtlebot3_msgs")
+BLACKLIST+=("turtlebot3_gazebo")
 BLACKLIST+=("turtlebot3_teleop")
 BLACKLIST+=("turtlebot3_bringup")
 BLACKLIST+=("turtlebot3_example")
 BLACKLIST+=("turtlebot3_fake_node")
+BLACKLIST+=("turtlebot3_simulations")
 BLACKLIST+=("turtlebot3_description")
 BLACKLIST+=("turtlebot3_navigation2")
 BLACKLIST+=("turtlebot3_cartographer")
@@ -28,18 +30,15 @@ BLACKLIST+=("zed_interfaces")
 BLACKLIST+=("zed-ros2-interfaces")
 
 #misc
-BLACKLIST+=("pkg1")
-BLACKLIST+=("pkg2")
 
 
 # Filter
-PKG_LIST=$(ls src)
+PKG_LIST=$(colcon list -n)
 
 for del in ${BLACKLIST[@]}
 do
         PKG_LIST=("${PKG_LIST[@]/$del}")
 done
-
 
 colcon build \
         --merge-install \

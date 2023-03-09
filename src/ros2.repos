@@ -3,50 +3,17 @@
 
 repositories:
 
-  # turtlebot3
   turtlebot3:
     type: git
     url: https://github.com/ROBOTIS-GIT/turtlebot3.git
     version: foxy-devel
-
-
-  # turtlebot3/turtlebot3_msgs:
-  #   type: git
-  #   url: https://github.com/ROBOTIS-GIT/turtlebot3_msgs.git
-  #   version: foxy-devel
-  # turtlebot3/turtlebot3_simulations:
-  #   type: git
-  #   url: https://github.com/ROBOTIS-GIT/turtlebot3_simulations.git
-  #   version: foxy-devel
-  # utils/DynamixelSDK:
-  #   type: git
-  #   url: https://github.com/ROBOTIS-GIT/DynamixelSDK.git
-  #   version: foxy-develsmap-ros2-containers.com/ROBOTIS-GIT/hls_lfcd_lds_driver.git
-  #   version: foxy-devel
-
-
-  # Zed Camera
-#  zed_wrapper:
-#    type: git
-#    url: https://github.com/stereolabs/zed-ros2-wrapper
-#    version: foxy-humble-v3.8
 
   zed-ros2-interfaces:
     type: git
     url: https://github.com/stereolabs/zed-ros2-interfaces.git
     version: foxy-humble-v3.8
 
-  # Semantic Mapping
-  # smap:git config --global --add safe.directory /workspaces/smap-ros2-containers/src/zed-ros2-interfaces
-  #   type: git
-  #   url: https://github.com/lucyannofrota/smap.git
-  #   version: main
-  # classifier_wrapper:
-  #   type: git
-  #   url: https://github.com/lucyannofrota/Classifier-Wrapper.git
-  #   version: main
-
-#  smap_interfaces:
-#    type: git
-#    url: https://github.com/stereolabs/zed-ros2-interfaces.git
-#    version: foxy-humble-v3.8
+  smap:
+    type: git
+    url: https://github.com/lucyannofrota/smap.git
+    version: 7fe8832

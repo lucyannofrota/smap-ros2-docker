@@ -5,7 +5,6 @@ site/*
 .devcontainer/ex
 src/*
 !src/ros2.repos
-src/temp
 
 delete.devcontainer/
 
@@ -18,3 +17,7 @@ zed2_files
 scripts/zed2_run.bash
 
 zed2.log
+
+scripts/git_credentials_timeout.txt
+
+delete_tmp_modules/

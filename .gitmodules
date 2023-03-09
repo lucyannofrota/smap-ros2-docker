@@ -1,7 +1,4 @@
-[submodule "src/smap"]
-	path = src/smap
-	url = https://github.com/lucyannofrota/semantic_mapping.git
-
-[submodule "src/smap_interfaces"]
-	path = src/smap_interfaces
-	url = https://github.com/lucyannofrota/semantic_mapping_interfaces.git
+# TODO: Enable modules
+#[submodule "smap"]
+#	path = src/smap
+#	url = https://github.com/lucyannofrota/smap.git
