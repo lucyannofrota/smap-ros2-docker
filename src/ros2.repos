@@ -17,3 +17,8 @@ repositories:
     type: git
     url: https://github.com/lucyannofrota/smap.git
     version: 7fe8832
+
+  p3dx_smap:
+    type: git
+    url: https://github.com/lucyannofrota/p3dx_smap.git
+    version: 2306660
