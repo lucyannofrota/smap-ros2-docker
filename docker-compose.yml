@@ -38,8 +38,14 @@ services:
         . install/setup.bash &&
         export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp && 
         export ROS_DOMAIN_ID=7 && 
-        RMW_IMPLEMENTATION=rmw_cyclonedds_cpp ROS_DOMAIN_ID=7 ros2 launch zed_wrapper zed2.launch.py
+        RMW_IMPLEMENTATION=rmw_cyclonedds_cpp ROS_DOMAIN_ID=7 ros2 launch zed_wrapper zed2.launch.py config_path:='/root/ros2_ws/config/p3dx.yaml'
       "
+    #bash -c "
+    #  . install/setup.bash &&
+    #  export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp && 
+    #  export ROS_DOMAIN_ID=7 && 
+    #  RMW_IMPLEMENTATION=rmw_cyclonedds_cpp ROS_DOMAIN_ID=7 ros2 launch zed_wrapper zed2.launch.py config_path:='/root/ros2_ws/config/p3dx.yaml'
+    #"
     #command: bash -c "ros2 launch zed_wrapper zed2.launch.py"
     deploy:
       resources:

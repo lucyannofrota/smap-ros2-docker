@@ -107,6 +107,20 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN sudo apt-get update -y && sudo apt install -y ros-foxy-rmw-cyclonedds-cpp
 ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 
+#RUN mkdir /root/ros2_ws/config && \
+#    cp /root/ros2_ws/src/zed-ros2-wrapper/zed_wrapper/config/common.yaml /root/ros2_ws/config/ && \
+#    mv /root/ros2_ws/config/common.yaml /root/ros2_ws/config/p3dx.yaml && \
+#    sed -i 's/set_as_static: false/set_as_static: true/g' /root/ros2_ws/config/p3dx.yaml && \
+#    sed -i 's/two_d_mode: false/two_d_mode: true/g' /root/ros2_ws/config/p3dx.yaml && \
+#    RMW_IMPLEMENTATION=rmw_cyclonedds_cpp ROS_DOMAIN_ID=7 ros2 launch zed_wrapper zed2.launch.py config_path:='/root/ros2_ws/config/p3dx.yaml'
+
+RUN mkdir /root/ros2_ws/config
+RUN cp /root/ros2_ws/src/zed-ros2-wrapper/zed_wrapper/config/common.yaml /root/ros2_ws/config/
+RUN mv /root/ros2_ws/config/common.yaml /root/ros2_ws/config/p3dx.yaml
+RUN sed -i 's/set_as_static: false/set_as_static: true/g' /root/ros2_ws/config/p3dx.yaml && \
+    sed -i 's/two_d_mode: false/two_d_mode: true/g' /root/ros2_ws/config/p3dx.yaml
+
+
 #CMD ["bash"]
 ENTRYPOINT []
 #entrypoint: [ "bash", "-c", "ros2 launch zed_wrapper zed2.launch.py" ]
