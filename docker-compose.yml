@@ -72,7 +72,14 @@ services:
       - ./:/workspaces/smap-ros2-docker/:cached
     cap_add:
       - SYS_PTRACE
-    command: bash -c "sudo ./workspaces/smap-ros2-docker/setup.bash ; ./workspaces/smap-ros2-docker/build.bash ; tail -F /dev/null"
+    command: > 
+      bash -c "
+        sudo ./workspaces/smap-ros2-docker/setup.bash ;
+        export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp ; 
+        export ROS_DOMAIN_ID=7 ;
+        ./workspaces/smap-ros2-docker/build.bash ;
+        tail -F /dev/null
+      "
     deploy:
       resources:
         reservations:

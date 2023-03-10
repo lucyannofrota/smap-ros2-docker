@@ -223,6 +223,7 @@ RUN echo "export RCUTILS_LOGGING_USE_STDOUT=1" >> /home/$USERNAME/.bashrc \
 	&& echo "export RCUTILS_LOGGING_BUFFERED_STREAM=1"  >> /home/$USERNAME/.bashrc \
 	&& echo "export RCUTILS_COLORIZED_OUTPUT=1"  >> /home/$USERNAME/.bashrc \
   && echo "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp"  >> /home/$USERNAME/.bashrc \
+  && echo "export ROS_DOMAIN_ID=7"  >> /home/$USERNAME/.bashrc \
 	&& echo "# export RCUTILS_CONSOLE_OUTPUT_FORMAT=\"[{severity}] [{name}]: {message} ({function_name}() at {file_name}:{line_number}) [{time}]\""  >> /home/$USERNAME/.bashrc \
 	&& echo "# export RCUTILS_CONSOLE_OUTPUT_FORMAT=\"[{severity}] [{name}]: {message}\""  >> /home/$USERNAME/.bashrc
 
