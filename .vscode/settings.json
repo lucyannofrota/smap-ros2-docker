@@ -99,7 +99,7 @@
     "C_Cpp.formatting": "Disabled",
     "uncrustify.configPath.linux": "/opt/ros/foxy/lib/python3.8/site-packages/ament_uncrustify/configuration/ament_code_style.cfg",
     "[cpp]": {
-        "editor.defaultFormatter": "zachflower.uncrustify"
+        "editor.defaultFormatter": "ms-vscode.cpptools"
     },
     "search.exclude": {
         "**/node_modules": true,
@@ -153,5 +153,6 @@
     ],
     "todo-tree.tree.showBadges": true,
     "cmake.sourceDirectory": "${workspaceFolder}/src/semantic_mapping",
-    "C_Cpp.errorSquiggles": "disabled"
+    "C_Cpp.errorSquiggles": "disabled",
+    "editor.selectionClipboard": false
 }
