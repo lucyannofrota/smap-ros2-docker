@@ -32,21 +32,14 @@ services:
 
     cap_add:
       - SYS_PTRACE
-    #command: sleep infinity
     command: >
       bash -c "
-        . install/setup.bash &&
+        . install/setup.bash && 
         export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp && 
         export ROS_DOMAIN_ID=7 && 
         RMW_IMPLEMENTATION=rmw_cyclonedds_cpp ROS_DOMAIN_ID=7 ros2 launch zed_wrapper zed2.launch.py publish_tf:=false
       "
-    #bash -c "
-    #  . install/setup.bash &&
-    #  export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp && 
-    #  export ROS_DOMAIN_ID=7 && 
-    #  RMW_IMPLEMENTATION=rmw_cyclonedds_cpp ROS_DOMAIN_ID=7 ros2 launch zed_wrapper zed2.launch.py config_path:='/root/ros2_ws/config/p3dx.yaml'
-    #"
-    #command: bash -c "ros2 launch zed_wrapper zed2.launch.py"
+
     deploy:
       resources:
         reservations:
@@ -74,7 +67,6 @@ services:
     volumes: 
       - /tmp/.X11-unix:/tmp/.X11-unix # Share X11 socket with container
       - $HOME/.Xauthority:/home/ros/.Xauthority # Share X11 permissions
-      # - $PWD/dev:/home/ros/dev
       - ./:/workspaces/smap-ros2-docker/:cached
     cap_add:
       - SYS_PTRACE
