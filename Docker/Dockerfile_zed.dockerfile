@@ -117,8 +117,9 @@ ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 RUN mkdir /root/ros2_ws/config
 RUN cp /root/ros2_ws/src/zed-ros2-wrapper/zed_wrapper/config/common.yaml /root/ros2_ws/config/
 RUN mv /root/ros2_ws/config/common.yaml /root/ros2_ws/config/p3dx.yaml
-RUN sed -i 's/set_as_static: false/set_as_static: true/g' /root/ros2_ws/config/p3dx.yaml && \
-    sed -i 's/two_d_mode: false/two_d_mode: true/g' /root/ros2_ws/config/p3dx.yaml
+#RUN sed -i 's/set_as_static: false/set_as_static: true/g' /root/ros2_ws/config/p3dx.yaml && \
+#    sed -i 's/two_d_mode: false/two_d_mode: true/g' /root/ros2_ws/config/p3dx.yaml && \
+#    sed -i 's/odometry_frame: "odom"/odometry_frame: "odom_zed2"/g' /root/ros2_ws/config/p3dx.yaml
 
 
 #CMD ["bash"]

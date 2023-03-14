@@ -21,3 +21,7 @@ zed2.log
 scripts/git_credentials_timeout.txt
 
 delete_tmp_modules/
+
+frames.gv
+
+frames.pdf
