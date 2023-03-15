@@ -74,11 +74,7 @@ RUN apt-get update -y || true && rosdep update && \
 # Install Ping
 RUN sudo apt-get update -y && sudo apt install iputils-ping
 
-# Cyclone already set on dustynv/ros:humble-ros-base-l4t-r35.1.0
-
-# Change ROS DDS
-#ARG DEBIAN_FRONTEND=noninteractive
-#RUN sudo apt-get update -y && sudo apt install -y ros-${ROS_DISTRO}-rmw-cyclonedds-cpp
+# Cyclone DDS already set on dustynv/ros:humble-ros-base-l4t-r35.1.0
 
 FROM extra-pkgs as configs
 
@@ -92,6 +88,10 @@ RUN /bin/bash -c "source /opt/ros/$ROS_DISTRO/install/setup.bash && \
   ' -DCMAKE_LIBRARY_PATH=/usr/local/cuda/lib64/stubs' \
   ' -DCMAKE_CXX_FLAGS="-Wl,--allow-shlib-undefined"' \
   ' --no-warn-unused-cli' "
+
+RUN mkdir /root/ros2_ws/config
+RUN cp /root/ros2_ws/src/zed-ros2-wrapper/zed_wrapper/config/common.yaml /root/ros2_ws/config/
+RUN mv /root/ros2_ws/config/common.yaml /root/ros2_ws/config/p3dx.yaml
 
 WORKDIR /root/ros2_ws
 

@@ -1,13 +1,11 @@
-# Based on https://github.com/gbalke/docker-ros2-opengl
-
 #version: '3.7'
 
 services:
 
   ros2-zed:
     network_mode: "host"
-    image: ros2-zed
-    container_name: ros2-zed
+    image: zed:foxy
+    container_name: zed-camera-foxy
     build:
       network: host
       context: .
@@ -23,20 +21,13 @@ services:
     volumes: 
       - /tmp/.X11-unix:/tmp/.X11-unix # Share X11 socket with container
       - $HOME/.Xauthority:/home/ros/.Xauthority # Share X11 permissions
-      # - $PWD/dev:/home/ros/dev
-      #- /Docker/Volumes/zed:/workspaces/zed_
-      #- ./mnt/Data/Docker/Volumes/Zed:/workspaces/zed
-      #https://linuxconfig.org/how-to-move-docker-s-default-var-lib-docker-to-another-directory-on-ubuntu-debian-linux
-      # sudo mount --rbind /mnt/docker /var/lib/docker
 
     cap_add:
       - SYS_PTRACE
-    #command: sleep infinity
-    command: bash -c ". install/setup.bash && export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp && ROS_DOMAIN_ID=7 ros2 launch zed_wrapper zed2.launch.py"
-    #command: bash -c "ros2 launch zed_wrapper zed2.launch.py"
-#    deploy:
-#      resources:
-#        reservations:
-#          devices:
-#            - driver: nvidia
-#              capabilities: [gpu]
+    command: >
+      bash -c "
+        . install/setup.bash && 
+        export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp && 
+        export ROS_DOMAIN_ID=7 && 
+        RMW_IMPLEMENTATION=rmw_cyclonedds_cpp ROS_DOMAIN_ID=7 ros2 launch zed_wrapper zed2.launch.py publish_tf:=false
+      "

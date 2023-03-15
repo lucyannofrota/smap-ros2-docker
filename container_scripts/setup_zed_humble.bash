@@ -11,6 +11,8 @@ docker run -it \
            -e DISPLAY \
            -v /tmp/.X11-unix:/tmp/.X11-unix \
            -w /root/ros2_ws \
+           --network host \
+           --rm \
            zed:humble \
            bash -c ". install/setup.bash ; RMW_IMPLEMENTATION=rmw_cyclonedds_cpp ROS_DOMAIN_ID=7 ros2 launch zed_wrapper zed2.launch.py"
 
