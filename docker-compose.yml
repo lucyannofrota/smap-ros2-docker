@@ -7,8 +7,8 @@ services:
   ros2-zed:
     #user: "ros"
     network_mode: "host"
-    image: ros2-zed
-    container_name: ros2-zed
+    image: smap:zed-wrapper
+    container_name: zed-wrapper
     build:
       network: host
       context: .
@@ -18,27 +18,13 @@ services:
     #ports:
     #  - 8080:8080 # Passthrough for Jupyter Notebook
     #  - 1234:1234 # Passthrough for SSH
-    environment:
-      - "DISPLAY"
-      - "QT_X11_NO_MITSHM=1" #fix some QT bugs
-    volumes: 
-      - /tmp/.X11-unix:/tmp/.X11-unix # Share X11 socket with container
-      - $HOME/.Xauthority:/home/ros/.Xauthority # Share X11 permissions
-      # - $PWD/dev:/home/ros/dev
-      #- /Docker/Volumes/zed:/workspaces/zed_
-      #- ./mnt/Data/Docker/Volumes/Zed:/workspaces/zed
+
       #https://linuxconfig.org/how-to-move-docker-s-default-var-lib-docker-to-another-directory-on-ubuntu-debian-linux
       # sudo mount --rbind /mnt/docker /var/lib/docker
 
     cap_add:
       - SYS_PTRACE
-    command: >
-      bash -c "
-        . install/setup.bash && 
-        export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp && 
-        export ROS_DOMAIN_ID=7 && 
-        RMW_IMPLEMENTATION=rmw_cyclonedds_cpp ROS_DOMAIN_ID=7 ros2 launch zed_wrapper zed2.launch.py publish_tf:=false
-      "
+    command: bash -c "RMW_IMPLEMENTATION=rmw_cyclonedds_cpp ROS_DOMAIN_ID=7 ros2 launch zed_wrapper zed2.launch.py publish_tf:=false"
 
     deploy:
       resources:
@@ -47,11 +33,11 @@ services:
             - driver: nvidia
               capabilities: [gpu]
 
-  ros2-cuda-base:
+  ros2-env:
     user: "ros"
     network_mode: "host"
-    image: ros2-full-cuda-gazebo-turtlebot:desktop
-    container_name: ros2-semantic-mapping-env
+    image: smap:env
+    container_name: smap-env
     build:
       network: host
       context: .
@@ -67,17 +53,45 @@ services:
     volumes: 
       - /tmp/.X11-unix:/tmp/.X11-unix # Share X11 socket with container
       - $HOME/.Xauthority:/home/ros/.Xauthority # Share X11 permissions
-      - ./:/workspaces/smap-ros2-docker/:cached
+      - ./:/workspace/:cached
+    cap_add:
+      - SYS_PTRACE
+    command: bash -c "tail -F /dev/null"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+
+  ros2-torch:
+    user: "ros"
+    network_mode: "host"
+    image: smap:ros2-torch
+    container_name: smap-torch
+    build:
+      network: host
+      context: .
+      dockerfile: ./Docker/Dockerfile_torch.dockerfile
+    privileged: true
+    # Not necessary when running in host network mode.
+    #ports:
+    #  - 8080:8080 # Passthrough for Jupyter Notebook
+    #  - 1234:1234 # Passthrough for SSH
+    environment:
+      - "DISPLAY"
+      - "QT_X11_NO_MITSHM=1" #fix some QT bugs
+    volumes: 
+      - /tmp/.X11-unix:/tmp/.X11-unix # Share X11 socket with container
+      - $HOME/.Xauthority:/home/ros/.Xauthority # Share X11 permissions
+      - ./classifier_data/classifier_1:/workspace/data/:cached
+      - ./src/smap/smap_interfaces:/workspace/src/smap/smap_interfaces
+      - ./src/smap/smap_classification_wrapper:/workspace/src/smap/smap_classification_wrapper
+      - ./src/smap/smap_classifiers:/workspace/src/smap/smap_classifiers
     cap_add:
       - SYS_PTRACE
     command: > 
-      bash -c "
-        sudo ./workspaces/smap-ros2-docker/setup.bash ;
-        export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp ; 
-        export ROS_DOMAIN_ID=7 ;
-        ./workspaces/smap-ros2-docker/build.bash ;
-        tail -F /dev/null
-      "
+      bash -c "tail -F /dev/null"
     deploy:
       resources:
         reservations:

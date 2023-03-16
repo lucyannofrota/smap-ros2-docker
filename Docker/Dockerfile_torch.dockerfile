@@ -5,12 +5,9 @@
 ###########################################
 # Base image 
 ###########################################
-#FROM nvidia/cuda:11.4.1-devel-ubuntu20.04 AS base
-#FROM nvidia/cuda:11.7.0-devel-ubuntu20.04 AS base
-FROM nvidia/cudagl:11.4.2-devel-ubuntu20.04 AS full-ros
+FROM nvidia/cudagl:11.4.2-devel-ubuntu20.04 AS base
 
 ENV ROS_DISTRO=foxy
-
 ENV UBUNTU_VERSION=20.04
 ENV WORKSPACE="/workspace"
 ARG WORKSPACE="/workspace"
@@ -59,7 +56,7 @@ ENV DEBIAN_FRONTEND=
 ###########################################
 #  Develop image 
 ###########################################
-#FROM base AS dev
+FROM base AS dev
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
@@ -111,44 +108,23 @@ ENV AMENT_CPPCHECK_ALLOW_SLOW_VERSIONS=1
 #  Full image 
 ###########################################
 #FROM dev AS full
-
-ENV DEBIAN_FRONTEND=noninteractive
-# Install the full release
-RUN apt-get update && apt-get install -y \
-  ros-${ROS_DISTRO}-desktop \
-  && rm -rf /var/lib/apt/lists/*
-ENV DEBIAN_FRONTEND=
-
+#
+#ENV DEBIAN_FRONTEND=noninteractive
+## Install the full release
+#RUN apt-get update && apt-get install -y \
+#  ros-${ROS_DISTRO}-desktop \
+#  && rm -rf /var/lib/apt/lists/*
+#ENV DEBIAN_FRONTEND=
 
 # Install DDS
 ARG DEBIAN_FRONTEND=noninteractive
 RUN sudo apt-get update -y && sudo apt install -y ros-${ROS_DISTRO}-rmw-cyclonedds-cpp
-ENV DEBIAN_FRONTEND=
 
 ###########################################
-#  Full+Gazebo image 
-###########################################
-FROM full-ros AS full-ros-nvidia-gazebo-turtlebot3
-
-ENV DEBIAN_FRONTEND=noninteractive
-# Install gazebo
-RUN apt-get update && apt-get install -q -y \
-  lsb-release \
-  wget \
-  gnupg \
-  sudo \
-  && wget https://packages.osrfoundation.org/gazebo.gpg -O /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg \
-  && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null \
-  && apt-get update && apt-get install -q -y \
-    ros-${ROS_DISTRO}-gazebo* \
-  && rm -rf /var/lib/apt/lists/*
-ENV DEBIAN_FRONTEND=
-
-###########################################
-#  Full+Gazebo+Nvidia image 
+#  Dev+Nvidia image 
 ###########################################
 
-#FROM gazebo AS gazebo-nvidia
+FROM dev AS nvidia
 
 ################
 # Expose the nvidia driver to allow opengl 
@@ -167,33 +143,16 @@ RUN apt-get update \
 ENV NVIDIA_VISIBLE_DEVICES all
 # ENV NVIDIA_DRIVER_CAPABILITIES graphics,utility,compute
 ENV QT_X11_NO_MITSHM 1
-##########################################
-#  Full+Gazebo+Nvidia+ZED-sdk+turtlebot image 
-##########################################
 
-#FROM gazebo-nvidia as turtlebot
+FROM nvidia as ml-torch
 
-# Turtlebot3
-ENV DEBIAN_FRONTEND=noninteractive
+RUN pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113
 
-ARG USERNAME=ros
+ENV TORCH_VERSION=1.12.1
+ENV TORCH_VISION_VERSION=0.13.1
+ENV TORCH_AUDIO_VERSION=0.12.1
 
-RUN sudo apt-get update
-RUN sudo apt-get -y install --no-install-recommends \
-  ros-${ROS_DISTRO}-gazebo-* \
-	ros-${ROS_DISTRO}-cartographer \
-	ros-${ROS_DISTRO}-cartographer-ros \
-	ros-${ROS_DISTRO}-navigation2 \
-	ros-${ROS_DISTRO}-nav2-bringup \
-	ros-${ROS_DISTRO}-dynamixel-sdk \
-	ros-${ROS_DISTRO}-turtlebot3*
-  
-RUN echo "export TURTLEBOT3_MODEL=burger" >> /home/$USERNAME/.bashrc \
-	&& echo "export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:${WORKSPACE}/src/turtlebot3/turtlebot3/turtlebot3_simulations/turtlebot3_gazebo/models" >> /home/$USERNAME/.bashrc
-
-ENV DEBIAN_FRONTEND=dialog
-
-FROM full-ros-nvidia-gazebo-turtlebot3 as env_setup
+FROM ml-torch as env_setup
 
 ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 ENV ROS_DOMAIN_ID=7
@@ -201,12 +160,33 @@ ENV RCUTILS_LOGGING_USE_STDOUT=1
 ENV RCUTILS_LOGGING_BUFFERED_STREAM=1
 ENV RCUTILS_COLORIZED_OUTPUT=1
 
-RUN echo "source ${WORKSPACE}/install/setup.bash" >> /home/$USERNAME/.bashrc \
+RUN echo "source /workspace/install/setup.bash" >> /home/$USERNAME/.bashrc \
 	&& echo "# export RCUTILS_CONSOLE_OUTPUT_FORMAT=\"[{severity}] [{name}]: {message} ({function_name}() at {file_name}:{line_number}) [{time}]\""  >> /home/$USERNAME/.bashrc \
 	&& echo "# export RCUTILS_CONSOLE_OUTPUT_FORMAT=\"[{severity}] [{name}]: {message}\""  >> /home/$USERNAME/.bashrc
 
-
+RUN mkdir -p ${WORKSPACE}
 WORKDIR ${WORKSPACE}
 
-ENTRYPOINT ["entrypoints/env_entrypoint.bash"]
+SHELL ["/bin/bash", "-c"]
+
+COPY scripts/setup.bash /workspace/setup.bash
+COPY scripts/full_build.bash /workspace/full_build.bash
+COPY scripts/build_smap.bash /workspace/build.bash
+COPY /entrypoints/torch_entrypoint.bash /workspace/torch_entrypoint.bash
+
+# Deploy
+# TODO: Change to correct repos
+#RUN mkdir src \  
+#  && cd src \  
+#  && git clone --recursive https://github.com/lucyannofrota/p3dx_smap.git \ 
+#  && cd .. \
+#  && ./setup.bash \ 
+#  && ./build.bash
+
+
+# Dev
+RUN mkdir src && sudo chown -R ros /workspace
+# && ./setup.bash && ./full_build.bash
+
+ENTRYPOINT ["/workspace/torch_entrypoint.bash"]
 CMD ["bash"]

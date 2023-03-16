@@ -1,6 +1,6 @@
 # First Use
 
-Run from the root folser:
+Run from the root folder:
 
 `sudo ./scripts/setup.bash && ./scripts/full_build.bash && ./scripts/build_smap.bash`
 
