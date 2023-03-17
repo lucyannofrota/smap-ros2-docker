@@ -13,6 +13,27 @@ services:
       network: host
       context: .
       dockerfile: ./Docker/Dockerfile_zed.dockerfile
+      args:
+        # Base Image
+        IMAGE_NAME: nvidia/cuda:11.4.1-devel-ubuntu20.04
+        UBUNTU_VERSION: 20.04
+        UBUNTU_RELEASE_YEAR: 20
+        CUDA_VERSION: 11.4.2
+        CUDA_MAJOR: 11
+        CUDA_MINOR: 4
+        ZED_SDK_MAJOR: 3
+        ZED_SDK_MINOR: 8
+
+        # ROS
+        ROS_DISTRO: foxy
+        WORKSPACE: /workspace
+        RMW_IMPLEMENTATION_INSTALL: rmw-cyclonedds-cpp
+        RMW_IMPLEMENTATION: rmw_cyclonedds_cpp
+        ROS_DOMAIN_ID: 7
+
+        # Entrypoint
+        ENTRYPOINT_HOST_PATH: Docker/entrypoints/zed_entrypoint.bash
+
     privileged: true
     # Not necessary when running in host network mode.
     #ports:
@@ -24,7 +45,11 @@ services:
 
     cap_add:
       - SYS_PTRACE
-    command: bash -c "RMW_IMPLEMENTATION=rmw_cyclonedds_cpp ROS_DOMAIN_ID=7 ros2 launch zed_wrapper zed2.launch.py publish_tf:=false"
+    command: >
+      bash -c "
+        export ROS_DOMAIN_ID=7 && 
+        RMW_IMPLEMENTATION=rmw_cyclonedds_cpp ROS_DOMAIN_ID=7 ros2 launch zed_wrapper zed2.launch.py publish_tf:=false
+      "
 
     deploy:
       resources:
@@ -42,6 +67,23 @@ services:
       network: host
       context: .
       dockerfile: ./Docker/Dockerfile_env.dockerfile
+      args:
+        # Base Image
+        IMAGE_NAME: nvidia/cudagl:11.4.2-devel-ubuntu20.04
+        UBUNTU_VERSION: 20.04
+        CUDA_VERSION: 11.4.2
+        GL_VERSION: 1.2
+
+        # ROS
+        ROS_DISTRO: foxy
+        WORKSPACE: /workspace
+        RMW_IMPLEMENTATION_INSTALL: rmw-cyclonedds-cpp
+        RMW_IMPLEMENTATION: rmw_cyclonedds_cpp
+        ROS_DOMAIN_ID: 7
+
+        # Entrypoint
+        ENTRYPOINT_HOST_PATH: Docker/entrypoints/env_entrypoint.bash
+
     privileged: true
     # Not necessary when running in host network mode.
     #ports:
@@ -73,6 +115,31 @@ services:
       network: host
       context: .
       dockerfile: ./Docker/Dockerfile_torch.dockerfile
+      args:
+        # Base Image
+        IMAGE_NAME: nvidia/cudagl:11.4.2-devel-ubuntu20.04
+        UBUNTU_VERSION: 20.04
+        CUDA_VERSION: 11.4.2
+        GL_VERSION: 1.2
+
+        # ROS
+        ROS_DISTRO: foxy
+        WORKSPACE: /workspace
+        RMW_IMPLEMENTATION_INSTALL: rmw-cyclonedds-cpp
+        RMW_IMPLEMENTATION: rmw_cyclonedds_cpp
+        ROS_DOMAIN_ID: 7
+
+        ## ML
+        # Pytorch
+        #https://pytorch.org/get-started/previous-versions/
+        PYTORCH: 1.12.1
+        TORCH_CUDA: cu113
+        TORCH_VISION: 0.13.1
+        TORCH_AUDIO: 0.12.1
+
+        # Entrypoint
+        ENTRYPOINT_HOST_PATH: Docker/entrypoints/torch_entrypoint.bash
+
     privileged: true
     # Not necessary when running in host network mode.
     #ports:

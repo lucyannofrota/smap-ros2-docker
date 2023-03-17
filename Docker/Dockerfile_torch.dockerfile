@@ -5,12 +5,56 @@
 ###########################################
 # Base image 
 ###########################################
-FROM nvidia/cudagl:11.4.2-devel-ubuntu20.04 AS base
 
-ENV ROS_DISTRO=foxy
-ENV UBUNTU_VERSION=20.04
-ENV WORKSPACE="/workspace"
-ARG WORKSPACE="/workspace"
+# Base Image
+ARG IMAGE_NAME=nvidia/cudagl:11.4.2-devel-ubuntu20.04
+ARG UBUNTU_VERSION=20.04
+ARG CUDA_VERSION=11.4.2
+ARG GL_VERSION=1.2
+
+FROM ${IMAGE_NAME} AS base
+
+##################
+## <PARAMETERS> ##
+##################
+
+# Base Image
+ENV IMAGE_NAME=${IMAGE_NAME}
+ENV UBUNTU_VERSION=${UBUNTU_VERSION}
+ENV CUDA_VERSION=${CUDA_VERSION}
+ENV GL_VERSION=${GL_VERSION}
+
+# ROS
+ARG ROS_DISTRO=foxy
+ENV ROS_DISTRO=${ROS_DISTRO}
+ARG WORKSPACE=/workspace
+ENV WORKSPACE=${WORKSPACE}
+ARG RMW_IMPLEMENTATION_INSTALL=rmw-cyclonedds-cpp
+ENV RMW_IMPLEMENTATION_INSTALL=${RMW_IMPLEMENTATION_INSTALL}
+ARG RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+ENV RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION}
+ARG ROS_DOMAIN_ID=7
+ENV ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
+
+# Pytorch
+#https://pytorch.org/get-started/previous-versions/
+ARG PYTORCH=1.12.1
+ENV PYTORCH=${PYTORCH}
+ARG TORCH_CUDA=cu113
+ENV TORCH_CUDA=${TORCH_CUDA}
+ARG TORCH_VISION=0.13.1
+ENV TORCH_VISION=${TORCH_VISION}
+ARG TORCH_AUDIO=0.12.1
+ENV TORCH_AUDIO=${TORCH_AUDIO}
+
+# Entrypoint
+ARG ENTRYPOINT_HOST_PATH=Docker/entrypoints/torch_entrypoint.bash
+ENV ENTRYPOINT_HOST_PATH=${ENTRYPOINT_HOST_PATH}
+
+###################
+## </PARAMETERS> ##
+###################
+
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -41,6 +85,7 @@ RUN apt-get update && apt-get install -y \
   && apt-get update && apt-get install -y \
     ros-${ROS_DISTRO}-ros-base \
     python3-argcomplete \
+    ros-${ROS_DISTRO}-${RMW_IMPLEMENTATION_INSTALL} \ 
   && rm -rf /var/lib/apt/lists/*
 
 ENV ROS_DISTRO=${ROS_DISTRO}
@@ -117,8 +162,9 @@ ENV AMENT_CPPCHECK_ALLOW_SLOW_VERSIONS=1
 #ENV DEBIAN_FRONTEND=
 
 # Install DDS
-ARG DEBIAN_FRONTEND=noninteractive
-RUN sudo apt-get update -y && sudo apt install -y ros-${ROS_DISTRO}-rmw-cyclonedds-cpp
+#ARG DEBIAN_FRONTEND=noninteractive
+#
+#RUN sudo apt-get update -y && sudo apt install -y ros-${ROS_DISTRO}-${RMW_IMPLEMENTATION_INSTALL}
 
 ###########################################
 #  Dev+Nvidia image 
@@ -146,7 +192,8 @@ ENV QT_X11_NO_MITSHM 1
 
 FROM nvidia as ml-torch
 
-RUN pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113
+
+RUN pip install torch==${PYTORCH}+${TORCH_CUDA} torchvision==${TORCH_VISION}+${TORCH_CUDA} torchaudio==${TORCH_AUDIO} --extra-index-url https://download.pytorch.org/whl/cu113
 
 ENV TORCH_VERSION=1.12.1
 ENV TORCH_VISION_VERSION=0.13.1
@@ -154,25 +201,23 @@ ENV TORCH_AUDIO_VERSION=0.12.1
 
 FROM ml-torch as env_setup
 
-ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-ENV ROS_DOMAIN_ID=7
 ENV RCUTILS_LOGGING_USE_STDOUT=1
 ENV RCUTILS_LOGGING_BUFFERED_STREAM=1
 ENV RCUTILS_COLORIZED_OUTPUT=1
 
-RUN echo "source /workspace/install/setup.bash" >> /home/$USERNAME/.bashrc \
+RUN echo "source ${WORKSPACE}/install/setup.bash" >> /home/$USERNAME/.bashrc \
 	&& echo "# export RCUTILS_CONSOLE_OUTPUT_FORMAT=\"[{severity}] [{name}]: {message} ({function_name}() at {file_name}:{line_number}) [{time}]\""  >> /home/$USERNAME/.bashrc \
 	&& echo "# export RCUTILS_CONSOLE_OUTPUT_FORMAT=\"[{severity}] [{name}]: {message}\""  >> /home/$USERNAME/.bashrc
 
 RUN mkdir -p ${WORKSPACE}
 WORKDIR ${WORKSPACE}
 
-SHELL ["/bin/bash", "-c"]
-
-COPY scripts/setup.bash /workspace/setup.bash
-COPY scripts/full_build.bash /workspace/full_build.bash
-COPY scripts/build_smap.bash /workspace/build.bash
-COPY /entrypoints/torch_entrypoint.bash /workspace/torch_entrypoint.bash
+COPY /scripts ${WORKSPACE}/scripts
+COPY ${ENTRYPOINT_HOST_PATH} /sbin/entrypoint.bash
+#COPY scripts/setup.bash /workspace/setup.bash
+#COPY scripts/full_build.bash /workspace/full_build.bash
+#COPY scripts/build_smap.bash /workspace/build.bash
+#COPY /entrypoints/torch_entrypoint.bash /workspace/torch_entrypoint.bash
 
 # Deploy
 # TODO: Change to correct repos
@@ -185,8 +230,7 @@ COPY /entrypoints/torch_entrypoint.bash /workspace/torch_entrypoint.bash
 
 
 # Dev
-RUN mkdir src && sudo chown -R ros /workspace
-# && ./setup.bash && ./full_build.bash
+RUN mkdir src && sudo chown -R ${USERNAME} ${WORKSPACE}
 
-ENTRYPOINT ["/workspace/torch_entrypoint.bash"]
+ENTRYPOINT ["/sbin/entrypoint.bash"]
 CMD ["bash"]

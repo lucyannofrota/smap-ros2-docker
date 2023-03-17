@@ -1,39 +1,17 @@
+# Container based on https://github.com/stereolabs/zed-ros2-wrapper/blob/master/docker/Dockerfile.u22-cu117-humble-devel
 
-# Base Image
+#ARG IMAGE_NAME=nvcr.io/nvidia/cuda:11.4.1-devel-ubuntu20.04
 ARG IMAGE_NAME=nvidia/cuda:11.4.1-devel-ubuntu20.04
-ARG UBUNTU_VERSION=20.04
-ARG CUDA_VERSION=11.4.1
 
 FROM ${IMAGE_NAME}
 
-# Base Image
-ENV IMAGE_NAME=${IMAGE_NAME}
-ENV UBUNTU_VERSION=${UBUNTU_VERSION}
-ENV CUDA_VERSION=${CUDA_VERSION}
-
-ARG UBUNTU_RELEASE_YEAR=22
+ARG UBUNTU_RELEASE_YEAR=20
 ARG CUDA_MAJOR=11
-ARG CUDA_MINOR=7
+ARG CUDA_MINOR=4
 ARG ZED_SDK_MAJOR=3
 ARG ZED_SDK_MINOR=8
 
-# ROS
-ARG ROS_DISTRO=foxy
-ENV ROS_DISTRO=${ROS_DISTRO}
-ARG WORKSPACE=/workspace
-ENV WORKSPACE=${WORKSPACE}
-ARG RMW_IMPLEMENTATION_INSTALL=rmw-cyclonedds-cpp
-ENV RMW_IMPLEMENTATION_INSTALL=${RMW_IMPLEMENTATION_INSTALL}
-ARG RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-ENV RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION}
-ARG ROS_DOMAIN_ID=7
-ENV ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
-
-# Entrypoint
-ARG ENTRYPOINT_HOST_PATH=Docker/entrypoints/zed_entrypoint.bash
-ENV ENTRYPOINT_HOST_PATH=${ENTRYPOINT_HOST_PATH}
-
-#ARG ROS_DISTRO=humble       # ROS2 distribution
+ARG ROS2_DIST=foxy       # ROS2 distribution
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -52,6 +30,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone &
   rm -rf /var/lib/apt/lists/*
 
 ############ Install ROS2 ############
+ENV ROS_DISTRO ${ROS2_DIST}
 
 # Set and Check Locale
 RUN apt-get update || true && \
@@ -74,13 +53,12 @@ RUN apt-get update || true && \
 # Install ROS 2 Base packages and Python dependencies
 RUN apt-get update || true && \
   apt-get install --no-install-recommends -y \
-  ros-${ROS_DISTRO}-ros-base \
-  ros-${ROS_DISTRO}-ament-cmake-clang-format \
-  ros-${ROS_DISTRO}-image-transport \
-  ros-${ROS_DISTRO}-image-transport-plugins \
-  ros-${ROS_DISTRO}-diagnostic-updater \
-  ros-${ROS_DISTRO}-xacro \
-  ros-${ROS_DISTRO}-${RMW_IMPLEMENTATION_INSTALL} \ 
+  ros-${ROS2_DIST}-ros-base \
+  ros-${ROS2_DIST}-ament-cmake-clang-format \
+  ros-${ROS2_DIST}-image-transport \
+  ros-${ROS2_DIST}-image-transport-plugins \
+  ros-${ROS2_DIST}-diagnostic-updater \
+  ros-${ROS2_DIST}-xacro \
   python3-flake8-docstrings \
   python3-pip \
   python3-pytest-cov \
@@ -107,12 +85,13 @@ RUN apt-get update -y || true && \
   ./ZED_SDK_Linux_Ubuntu.run -- silent skip_tools skip_cuda && \
   ln -sf /lib/x86_64-linux-gnu/libusb-1.0.so.0 /usr/lib/x86_64-linux-gnu/libusb-1.0.so && \
   rm ZED_SDK_Linux_Ubuntu.run && \
-  rm -rf /var/lib/apt/lists/*
+  rm -rf /var/lib/apt/lists/* && \
+  apt-get autoremove && apt-get clean
 
 # Install the ZED ROS2 Wrapper
-WORKDIR ${WORKSPACE}/src
+WORKDIR /root/ros2_ws/src
 RUN git clone --recursive https://github.com/stereolabs/zed-ros2-wrapper.git
-WORKDIR ${WORKSPACE}
+WORKDIR /root/ros2_ws
 
 RUN /bin/bash -c "source /opt/ros/$ROS_DISTRO/setup.bash && \
   rosdep install --from-paths src --ignore-src -r -y && \
@@ -123,15 +102,27 @@ RUN /bin/bash -c "source /opt/ros/$ROS_DISTRO/setup.bash && \
   ' -DCMAKE_CXX_FLAGS="-Wl,--allow-shlib-undefined"' "
 
 
-COPY /scripts ${WORKSPACE}/scripts
-COPY ${ENTRYPOINT_HOST_PATH} /sbin/entrypoint.bash
+# Change ROS FOXY DDS
+ARG DEBIAN_FRONTEND=noninteractive
+RUN sudo apt-get update -y && sudo apt install -y ros-foxy-rmw-cyclonedds-cpp
 
-#RUN echo "#!/bin/bash" >> /sbin/entrypoint.bash \ 
-#  && echo "pwd" >> /sbin/entrypoint.bash \
-#  && echo "ls ${WORKSPACE}" >> /sbin/entrypoint.bash \
-#  && echo ".${WORKSPACE}/${ENTRYPOINT}" >> /sbin/entrypoint.bash \
-#  && chmod +x /sbin/entrypoint.bash
+#RUN mkdir /root/ros2_ws/config
+#RUN cp /root/ros2_ws/src/zed-ros2-wrapper/zed_wrapper/config/common.yaml /root/ros2_ws/config/
+#RUN mv /root/ros2_ws/config/common.yaml /root/ros2_ws/config/p3dx.yaml
+#RUN sed -i 's/set_as_static: false/set_as_static: true/g' /root/ros2_ws/config/p3dx.yaml && \
+#    sed -i 's/two_d_mode: false/two_d_mode: true/g' /root/ros2_ws/config/p3dx.yaml && \
+#    sed -i 's/odometry_frame: "odom"/odometry_frame: "odom_zed2"/g' /root/ros2_ws/config/p3dx.yaml
 
 
-ENTRYPOINT ["/sbin/entrypoint.bash"]
+ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+ENV ROS_DOMAIN_ID=7
+
+#RUN echo "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp"  >> /home/$USERNAME/.bashrc \
+#  && echo "export ROS_DOMAIN_ID=7"  >> /home/$USERNAME/.bashrc 
+
+#RUM cp /root/ros2_ws/src/zed-ros2-wrapper/docker/ros_entrypoint.sh
+
+RUN chmod +x /root/ros2_ws/src/zed-ros2-wrapper/docker/ros_entrypoint.sh
+
+ENTRYPOINT ["/root/ros2_ws/src/zed-ros2-wrapper/docker/ros_entrypoint.sh"]
 CMD ["bash"]

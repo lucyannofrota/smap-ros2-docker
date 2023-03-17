@@ -5,15 +5,36 @@
 ###########################################
 # Base image 
 ###########################################
-#FROM nvidia/cuda:11.4.1-devel-ubuntu20.04 AS base
-#FROM nvidia/cuda:11.7.0-devel-ubuntu20.04 AS base
+
+# Base Image
+ARG IMAGE_NAME=nvidia/cudagl:11.4.2-devel-ubuntu20.04
+ARG UBUNTU_VERSION=20.04
+ARG CUDA_VERSION=11.4.2
+ARG GL_VERSION=1.2
+
 FROM nvidia/cudagl:11.4.2-devel-ubuntu20.04 AS full-ros
 
-ENV ROS_DISTRO=foxy
+# Base Image
+ENV IMAGE_NAME=${IMAGE_NAME}
+ENV UBUNTU_VERSION=${UBUNTU_VERSION}
+ENV CUDA_VERSION=${CUDA_VERSION}
+ENV GL_VERSION=${GL_VERSION}
 
-ENV UBUNTU_VERSION=20.04
-ENV WORKSPACE="/workspace"
-ARG WORKSPACE="/workspace"
+# ROS
+ARG ROS_DISTRO=foxy
+ENV ROS_DISTRO=${ROS_DISTRO}
+ARG WORKSPACE=/workspace
+ENV WORKSPACE=${WORKSPACE}
+ARG RMW_IMPLEMENTATION_INSTALL=rmw-cyclonedds-cpp
+ENV RMW_IMPLEMENTATION_INSTALL=${RMW_IMPLEMENTATION_INSTALL}
+ARG RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+ENV RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION}
+ARG ROS_DOMAIN_ID=7
+ENV ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
+
+# Entrypoint
+ARG ENTRYPOINT_HOST_PATH=Docker/entrypoints/env_entrypoint.bash
+ENV ENTRYPOINT_HOST_PATH=${ENTRYPOINT_HOST_PATH}
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -44,6 +65,7 @@ RUN apt-get update && apt-get install -y \
   && apt-get update && apt-get install -y \
     ros-${ROS_DISTRO}-ros-base \
     python3-argcomplete \
+    ros-${ROS_DISTRO}-${RMW_IMPLEMENTATION_INSTALL} \ 
   && rm -rf /var/lib/apt/lists/*
 
 ENV ROS_DISTRO=${ROS_DISTRO}
@@ -121,9 +143,9 @@ ENV DEBIAN_FRONTEND=
 
 
 # Install DDS
-ARG DEBIAN_FRONTEND=noninteractive
-RUN sudo apt-get update -y && sudo apt install -y ros-${ROS_DISTRO}-rmw-cyclonedds-cpp
-ENV DEBIAN_FRONTEND=
+#ARG DEBIAN_FRONTEND=noninteractive
+#RUN sudo apt-get update -y && sudo apt install -y ros-${ROS_DISTRO}-RUN sudo apt-get update -y && sudo apt install -y ros-${ROS_DISTRO}-${RMW_IMPLEMENTATION_INSTALL}
+#ENV DEBIAN_FRONTEND=
 
 ###########################################
 #  Full+Gazebo image 
@@ -195,8 +217,6 @@ ENV DEBIAN_FRONTEND=dialog
 
 FROM full-ros-nvidia-gazebo-turtlebot3 as env_setup
 
-ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-ENV ROS_DOMAIN_ID=7
 ENV RCUTILS_LOGGING_USE_STDOUT=1
 ENV RCUTILS_LOGGING_BUFFERED_STREAM=1
 ENV RCUTILS_COLORIZED_OUTPUT=1
@@ -207,6 +227,7 @@ RUN echo "source ${WORKSPACE}/install/setup.bash" >> /home/$USERNAME/.bashrc \
 
 
 WORKDIR ${WORKSPACE}
+COPY ${ENTRYPOINT_HOST_PATH} /sbin/entrypoint.bash
 
-ENTRYPOINT ["entrypoints/env_entrypoint.bash"]
+ENTRYPOINT ["/sbin/entrypoint.bash"]
 CMD ["bash"]
