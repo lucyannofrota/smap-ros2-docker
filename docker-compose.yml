@@ -114,6 +114,7 @@ services:
     build:
       network: host
       context: .
+      target: env_setup
       dockerfile: ./Docker/Dockerfile_torch.dockerfile
       args:
         # Base Image
@@ -159,6 +160,75 @@ services:
       - SYS_PTRACE
     command: > 
       bash -c "tail -F /dev/null"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+
+
+  ros2-torch-yolov5:
+    user: "ros"
+    network_mode: "host"
+    image: smap:torch-yolov5
+    container_name: smap-torch-yolov5
+    build:
+      network: host
+      context: .
+      target: yolov5
+      dockerfile: ./Docker/Dockerfile_torch.dockerfile
+      args:
+        # Base Image
+        IMAGE_NAME: nvidia/cudagl:11.4.2-devel-ubuntu20.04
+        UBUNTU_VERSION: 20.04
+        CUDA_VERSION: 11.4.2
+        GL_VERSION: 1.2
+
+        # ROS
+        ROS_DISTRO: foxy
+        WORKSPACE: /workspace
+        RMW_IMPLEMENTATION_INSTALL: rmw-cyclonedds-cpp
+        RMW_IMPLEMENTATION: rmw_cyclonedds_cpp
+        ROS_DOMAIN_ID: 7
+
+        ## ML
+        # Pytorch
+        #https://pytorch.org/get-started/previous-versions/
+        PYTORCH: 1.12.1
+        TORCH_CUDA: cu113
+        TORCH_VISION: 0.13.1
+        TORCH_AUDIO: 0.12.1
+
+        # Entrypoint
+        ENTRYPOINT_HOST_PATH: Docker/entrypoints/torch_entrypoint.bash
+
+    privileged: true
+    # Not necessary when running in host network mode.
+    #ports:
+    #  - 8080:8080 # Passthrough for Jupyter Notebook
+    #  - 1234:1234 # Passthrough for SSH
+    environment:
+      - "DISPLAY"
+      - "QT_X11_NO_MITSHM=1" #fix some QT bugs
+    volumes: 
+      - /tmp/.X11-unix:/tmp/.X11-unix # Share X11 socket with container
+      - $HOME/.Xauthority:/home/ros/.Xauthority # Share X11 permissions
+      - ./classifier_data/classifier_1:/workspace/data/:cached
+      - ./src/smap/smap_interfaces:/workspace/src/smap/smap_interfaces
+      - ./src/smap/smap_classification_wrapper:/workspace/src/smap/smap_classification_wrapper
+      - ./src/smap/smap_classifiers:/workspace/src/smap/smap_classifiers
+    cap_add:
+      - SYS_PTRACE
+    command: > 
+      bash -c "
+        ros2 run smap_classifiers yolo_v5.py ; 
+        jupyter-lab --no-browser --notebook-dir=src/smap/smap_classifiers/notebooks/yolo_v5 --NotebookApp.token='' --NotebookApp.password='' ; 
+        tail -F /dev/null
+      "
+    #jupyter-lab --no-browser --notebook-dir=src/smap/smap_classifiers/notebooks ;
+    #bash -c "tail -F /dev/null"
+      
     deploy:
       resources:
         reservations:

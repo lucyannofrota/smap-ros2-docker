@@ -55,5 +55,5 @@ echo "------------------------------" | sed 's/^/  /'
 echo "smap pkgs:" | sed 's/^/  /'
 ros2 pkg list | grep smap | sed 's/^/  /' | sed 's/^/  /'
 echo "------------------------------"  | sed 's/^/  /'
-echo "---</env_entrypoint.bash>---"
+echo "---</torch_entrypoint.bash>---"
 exec "$@"

@@ -214,23 +214,22 @@ WORKDIR ${WORKSPACE}
 
 COPY /scripts ${WORKSPACE}/scripts
 COPY ${ENTRYPOINT_HOST_PATH} /sbin/entrypoint.bash
-#COPY scripts/setup.bash /workspace/setup.bash
-#COPY scripts/full_build.bash /workspace/full_build.bash
-#COPY scripts/build_smap.bash /workspace/build.bash
-#COPY /entrypoints/torch_entrypoint.bash /workspace/torch_entrypoint.bash
 
-# Deploy
-# TODO: Change to correct repos
-#RUN mkdir src \  
-#  && cd src \  
-#  && git clone --recursive https://github.com/lucyannofrota/p3dx_smap.git \ 
-#  && cd .. \
-#  && ./setup.bash \ 
-#  && ./build.bash
-
-
-# Dev
 RUN mkdir src && sudo chown -R ${USERNAME} ${WORKSPACE}
 
 ENTRYPOINT ["/sbin/entrypoint.bash"]
 CMD ["bash"]
+
+FROM env_setup as yolov5
+
+# Dev
+
+RUN pip install jupyterlab
+
+
+# Deploy
+
+#RUN git clone --recursive https://github.com/lucyannofrota/smap_interfaces.git ${WORKSPACE}/src/smap_interfaces \
+#  && git clone --recursive https://github.com/lucyannofrota/smap_classification_wrapper.git ${WORKSPACE}/src/smap_classification_wrapper \
+#  && git clone --recursive https://github.com/lucyannofrota/smap_classifiers.git ${WORKSPACE}/src/smap_classifiers
+
