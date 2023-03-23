@@ -29,6 +29,9 @@ BLACKLIST+=("turtlebot3_cartographer")
 BLACKLIST+=("zed_interfaces")
 BLACKLIST+=("zed-ros2-interfaces")
 
+#smap
+BLACKLIST+=("smap-perception-yolo-v5")
+
 #misc
 
 

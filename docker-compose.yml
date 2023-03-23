@@ -67,6 +67,7 @@ services:
       network: host
       context: .
       dockerfile: ./Docker/Dockerfile_env.dockerfile
+      #target: full-ros-nvidia-gazebo-turtlebot3
       args:
         # Base Image
         IMAGE_NAME: nvidia/cudagl:11.4.2-devel-ubuntu20.04
@@ -95,7 +96,8 @@ services:
     volumes: 
       - /tmp/.X11-unix:/tmp/.X11-unix # Share X11 socket with container
       - $HOME/.Xauthority:/home/ros/.Xauthority # Share X11 permissions
-      - ./:/workspace/:cached
+      - ./src:/workspace/src
+      - ./scripts:/workspace/scripts
     cap_add:
       - SYS_PTRACE
     command: bash -c "tail -F /dev/null"
@@ -114,7 +116,7 @@ services:
     build:
       network: host
       context: .
-      target: env_setup
+      target: env-setup
       dockerfile: ./Docker/Dockerfile_torch.dockerfile
       args:
         # Base Image
@@ -152,10 +154,9 @@ services:
     volumes: 
       - /tmp/.X11-unix:/tmp/.X11-unix # Share X11 socket with container
       - $HOME/.Xauthority:/home/ros/.Xauthority # Share X11 permissions
-      - ./classifier_data/classifier_1:/workspace/data/:cached
       - ./src/smap/smap_interfaces:/workspace/src/smap/smap_interfaces
       - ./src/smap/smap_classification_wrapper:/workspace/src/smap/smap_classification_wrapper
-      - ./src/smap/smap_classifiers:/workspace/src/smap/smap_classifiers
+      - ./src/smap/smap-perception-yolo-v5:/workspace/src/smap/smap-perception-yolo-v5
     cap_add:
       - SYS_PTRACE
     command: > 
@@ -176,7 +177,8 @@ services:
     build:
       network: host
       context: .
-      target: yolov5
+      #target: ml-torch
+      target: yolo-v5
       dockerfile: ./Docker/Dockerfile_torch.dockerfile
       args:
         # Base Image
@@ -201,7 +203,9 @@ services:
         TORCH_AUDIO: 0.12.1
 
         # Entrypoint
-        ENTRYPOINT_HOST_PATH: Docker/entrypoints/torch_entrypoint.bash
+        ENTRYPOINT_HOST_PATH: Docker/entrypoints/tolo_v5_entrypoint.bash
+      #shm_size: '2gb' # <-- when BUILDING
+    shm_size: '8gb' # <-- when RUNNING 
 
     privileged: true
     # Not necessary when running in host network mode.
@@ -214,19 +218,21 @@ services:
     volumes: 
       - /tmp/.X11-unix:/tmp/.X11-unix # Share X11 socket with container
       - $HOME/.Xauthority:/home/ros/.Xauthority # Share X11 permissions
-      - ./classifier_data/classifier_1:/workspace/data/:cached
       - ./src/smap/smap_interfaces:/workspace/src/smap/smap_interfaces
       - ./src/smap/smap_classification_wrapper:/workspace/src/smap/smap_classification_wrapper
-      - ./src/smap/smap_classifiers:/workspace/src/smap/smap_classifiers
+      - ./src/smap/smap-perception-yolo-v5:/workspace/src/smap/smap-perception-yolo-v5
+      - torch-yolov5:/workspace/src/smap/smap-perception-yolo-v5/notebooks/yolo_v5/yolov5
+      - datasets:/workspace/src/smap/smap-perception-yolo-v5/notebooks/yolo_v5/datasets
     cap_add:
       - SYS_PTRACE
     command: > 
       bash -c "
-        ros2 run smap_classifiers yolo_v5.py ; 
-        jupyter-lab --no-browser --notebook-dir=src/smap/smap_classifiers/notebooks/yolo_v5 --NotebookApp.token='' --NotebookApp.password='' ; 
+        jupyter-lab --no-browser --notebook-dir=src/smap/smap-perception-yolo-v5/notebooks/yolo_v5 --NotebookApp.token='' --NotebookApp.password='' --NotebookApp.username=''; 
+        chmod 777 /dev/video0 ;
         tail -F /dev/null
       "
-    #jupyter-lab --no-browser --notebook-dir=src/smap/smap_classifiers/notebooks ;
+    #ros2 run smap-perception-yolo-v5 yolo_v5.py ; 
+    #jupyter-lab --no-browser --notebook-dir=src/smap/smap-perception-yolo-v5/notebooks ;
     #bash -c "tail -F /dev/null"
       
     deploy:
@@ -235,3 +241,10 @@ services:
           devices:
             - driver: nvidia
               capabilities: [gpu]
+
+
+volumes:
+  torch-yolov5:
+    external: true
+  datasets:
+    external: true

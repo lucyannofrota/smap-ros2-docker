@@ -150,23 +150,6 @@ ENV DEBIAN_FRONTEND=
 ENV AMENT_CPPCHECK_ALLOW_SLOW_VERSIONS=1
 
 ###########################################
-#  Full image 
-###########################################
-#FROM dev AS full
-#
-#ENV DEBIAN_FRONTEND=noninteractive
-## Install the full release
-#RUN apt-get update && apt-get install -y \
-#  ros-${ROS_DISTRO}-desktop \
-#  && rm -rf /var/lib/apt/lists/*
-#ENV DEBIAN_FRONTEND=
-
-# Install DDS
-#ARG DEBIAN_FRONTEND=noninteractive
-#
-#RUN sudo apt-get update -y && sudo apt install -y ros-${ROS_DISTRO}-${RMW_IMPLEMENTATION_INSTALL}
-
-###########################################
 #  Dev+Nvidia image 
 ###########################################
 
@@ -190,16 +173,7 @@ ENV NVIDIA_VISIBLE_DEVICES all
 # ENV NVIDIA_DRIVER_CAPABILITIES graphics,utility,compute
 ENV QT_X11_NO_MITSHM 1
 
-FROM nvidia as ml-torch
-
-
-RUN pip install torch==${PYTORCH}+${TORCH_CUDA} torchvision==${TORCH_VISION}+${TORCH_CUDA} torchaudio==${TORCH_AUDIO} --extra-index-url https://download.pytorch.org/whl/cu113
-
-ENV TORCH_VERSION=1.12.1
-ENV TORCH_VISION_VERSION=0.13.1
-ENV TORCH_AUDIO_VERSION=0.12.1
-
-FROM ml-torch as env_setup
+FROM nvidia as env-setup
 
 ENV RCUTILS_LOGGING_USE_STDOUT=1
 ENV RCUTILS_LOGGING_BUFFERED_STREAM=1
@@ -220,16 +194,61 @@ RUN mkdir src && sudo chown -R ${USERNAME} ${WORKSPACE}
 ENTRYPOINT ["/sbin/entrypoint.bash"]
 CMD ["bash"]
 
-FROM env_setup as yolov5
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+FROM env-setup as ml-torch
+
+RUN pip install torch==${PYTORCH}+${TORCH_CUDA} torchvision==${TORCH_VISION}+${TORCH_CUDA} torchaudio==${TORCH_AUDIO} --extra-index-url https://download.pytorch.org/whl/cu113
+
+ENV TORCH_VERSION=1.12.1
+ENV TORCH_VISION_VERSION=0.13.1
+ENV TORCH_AUDIO_VERSION=0.12.1
+
+FROM ml-torch as yolo-v5
+
+RUN pip install jupyterlab \
+  && pip install -U tensorboard \
+  && mkdir -p ${WORKSPACE}/src/smap/smap-perception-yolo-v5/notebooks/yolo_v5/yolov5 \
+  && chown -R ros ${WORKSPACE}/src/smap/smap-perception-yolo-v5/notebooks/yolo_v5/yolov5 \ 
+  && mkdir -p ${WORKSPACE}/src/smap/smap-perception-yolo-v5/notebooks/yolo_v5/datasets \
+  && chown -R ros ${WORKSPACE}/src/smap/smap-perception-yolo-v5/notebooks/yolo_v5/datasets
 
 # Dev
 
-RUN pip install jupyterlab
+# Enable webcan access
 
-
+# Deploy
 # Deploy
 
 #RUN git clone --recursive https://github.com/lucyannofrota/smap_interfaces.git ${WORKSPACE}/src/smap_interfaces \
 #  && git clone --recursive https://github.com/lucyannofrota/smap_classification_wrapper.git ${WORKSPACE}/src/smap_classification_wrapper \
-#  && git clone --recursive https://github.com/lucyannofrota/smap_classifiers.git ${WORKSPACE}/src/smap_classifiers
+#  && git clone --recursive https://github.com/lucyannofrota/smap-perception-yolo-v5.git ${WORKSPACE}/src/smap-perception-yolo-v5
 
