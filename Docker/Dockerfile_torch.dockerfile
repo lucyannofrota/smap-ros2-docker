@@ -234,21 +234,25 @@ ENV TORCH_AUDIO_VERSION=0.12.1
 
 FROM ml-torch as yolo-v5
 
+USER ${USERNAME}
+
 RUN pip install jupyterlab \
   && pip install -U tensorboard \
-  && mkdir -p ${WORKSPACE}/src/smap/smap-perception-yolo-v5/notebooks/yolo_v5/yolov5 \
-  && chown -R ros ${WORKSPACE}/src/smap/smap-perception-yolo-v5/notebooks/yolo_v5/yolov5 \ 
-  && mkdir -p ${WORKSPACE}/src/smap/smap-perception-yolo-v5/notebooks/yolo_v5/datasets \
-  && chown -R ros ${WORKSPACE}/src/smap/smap-perception-yolo-v5/notebooks/yolo_v5/datasets
+  && mkdir -p ${WORKSPACE}/src/smap/smap_perception_yolo_v5/notebooks/yolo_v5/yolov5 \
+  && chown -R ${USERNAME} ${WORKSPACE}/src/smap/smap_perception_yolo_v5/notebooks/yolo_v5/yolov5 \ 
+  && mkdir -p ${WORKSPACE}/src/smap/smap_perception_yolo_v5/notebooks/yolo_v5/datasets \
+  && chown -R ${USERNAME} ${WORKSPACE}/src/smap/smap_perception_yolo_v5/notebooks/yolo_v5/datasets
 
 # Dev
 
 # Enable webcan access
+
+
 
 # Deploy
 # Deploy
 
 #RUN git clone --recursive https://github.com/lucyannofrota/smap_interfaces.git ${WORKSPACE}/src/smap_interfaces \
 #  && git clone --recursive https://github.com/lucyannofrota/smap_classification_wrapper.git ${WORKSPACE}/src/smap_classification_wrapper \
-#  && git clone --recursive https://github.com/lucyannofrota/smap-perception-yolo-v5.git ${WORKSPACE}/src/smap-perception-yolo-v5
+#  && git clone --recursive https://github.com/lucyannofrota/smap_perception_yolo_v5.git ${WORKSPACE}/src/smap_perception_yolo_v5
 

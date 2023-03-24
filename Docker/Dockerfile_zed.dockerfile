@@ -84,6 +84,7 @@ RUN apt-get update || true && \
   python3-flake8-docstrings \
   python3-pip \
   python3-pytest-cov \
+  python3-vcstool \ 
   ros-dev-tools && \
   pip3 install \
   argcomplete \
@@ -110,8 +111,31 @@ RUN apt-get update -y || true && \
   rm -rf /var/lib/apt/lists/*
 
 # Install the ZED ROS2 Wrapper
+
+#ARG USERNAME=ros
+#ARG USER_UID=1000
+#ARG USER_GID=$USER_UID
+#
+## Create a non-root user
+#RUN groupadd --gid $USER_GID $USERNAME \
+#  && useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME \
+#  # [Optional] Add sudo support for the non-root user
+#  && apt-get update \
+#  && apt-get install -y sudo \
+#  && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME\
+#  && chmod 0440 /etc/sudoers.d/$USERNAME \
+#  # Cleanup
+#  && rm -rf /var/lib/apt/lists/* \
+#  && echo "source /usr/share/bash-completion/completions/git" >> /home/$USERNAME/.bashrc \
+#  && echo "if [ -f /opt/ros/${ROS_DISTRO}/setup.bash ]; then source /opt/ros/${ROS_DISTRO}/setup.bash; fi" >> /home/$USERNAME/.bashrc \ 
+#  && mkdir ${WORKSPACE} && chown -R ${USERNAME} ${WORKSPACE} && chown 777 -R ${WORKSPACE}
+
 WORKDIR ${WORKSPACE}/src
+# TODO: Change to vcs repos
+#&& git clone --recursive https://github.com/lucyannofrota/smap_sampler.git
+#&& git clone --recursive https://github.com/lucyannofrota/smap_interfaces.git
 RUN git clone --recursive https://github.com/stereolabs/zed-ros2-wrapper.git
+
 WORKDIR ${WORKSPACE}
 
 RUN /bin/bash -c "source /opt/ros/$ROS_DISTRO/setup.bash && \
@@ -123,14 +147,10 @@ RUN /bin/bash -c "source /opt/ros/$ROS_DISTRO/setup.bash && \
   ' -DCMAKE_CXX_FLAGS="-Wl,--allow-shlib-undefined"' "
 
 
+#USER ${USERNAME}
+
 COPY /scripts ${WORKSPACE}/scripts
 COPY ${ENTRYPOINT_HOST_PATH} /sbin/entrypoint.bash
-
-#RUN echo "#!/bin/bash" >> /sbin/entrypoint.bash \ 
-#  && echo "pwd" >> /sbin/entrypoint.bash \
-#  && echo "ls ${WORKSPACE}" >> /sbin/entrypoint.bash \
-#  && echo ".${WORKSPACE}/${ENTRYPOINT}" >> /sbin/entrypoint.bash \
-#  && chmod +x /sbin/entrypoint.bash
 
 
 ENTRYPOINT ["/sbin/entrypoint.bash"]

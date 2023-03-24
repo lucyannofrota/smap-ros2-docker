@@ -5,21 +5,24 @@ set -e
 cd $WORKSPACE
 
 # Downloading repos
-(
-        rm -r -f build install log | sed 's/^/  /'
-        rm -r -f src/turtlebot3 | sed 's/^/  /'
-        vcs import < src/ros2.repos src | sed 's/^/  /'
-        sed -i '2,5d' src/turtlebot3/turtlebot3.repos | sed 's/^/  /'
-        vcs import < src/turtlebot3/turtlebot3.repos src | sed 's/^/  /'
-        vcs import < src/turtlebot3/turtlebot3_ci.repos src | sed 's/^/  /'
-)
+#(
+#        rm -r -f build install log | sed 's/^/  /'
+#        rm -r -f src/turtlebot3 | sed 's/^/  /'
+#        vcs import < src/ros2.repos src | sed 's/^/  /'
+#        sed -i '2,5d' src/turtlebot3/turtlebot3.repos | sed 's/^/  /'
+#        vcs import < src/turtlebot3/turtlebot3.repos src | sed 's/^/  /'
+#        vcs import < src/turtlebot3/turtlebot3_ci.repos src | sed 's/^/  /'
+#)
+
 # TODO: Make the repositories public
 #vcs import < src/smap/smap.repos src/smap
 
 # setup ros2 environment
 (
-        ./scripts/setup.bash | sed 's/^/  /' && ./scripts/full_build.bash | sed 's/^/  /'
+        ./scripts/setup.bash | sed 's/^/  /'
+        ./scripts/build_smap.bash | sed 's/^/  /'
 )
+
 . install/setup.bash
 
 # Initial Log

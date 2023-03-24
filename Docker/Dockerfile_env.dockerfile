@@ -221,13 +221,27 @@ ENV RCUTILS_LOGGING_USE_STDOUT=1
 ENV RCUTILS_LOGGING_BUFFERED_STREAM=1
 ENV RCUTILS_COLORIZED_OUTPUT=1
 
-RUN echo "source ${WORKSPACE}/install/setup.bash" >> /home/$USERNAME/.bashrc \
-	&& echo "# export RCUTILS_CONSOLE_OUTPUT_FORMAT=\"[{severity}] [{name}]: {message} ({function_name}() at {file_name}:{line_number}) [{time}]\""  >> /home/$USERNAME/.bashrc \
-	&& echo "# export RCUTILS_CONSOLE_OUTPUT_FORMAT=\"[{severity}] [{name}]: {message}\""  >> /home/$USERNAME/.bashrc
-
 
 WORKDIR ${WORKSPACE}
 COPY ${ENTRYPOINT_HOST_PATH} /sbin/entrypoint.bash
+COPY /scripts ${WORKSPACE}/scripts
+COPY /src/ros2.repos ${WORKSPACE}/src/ros2.repos
+
+RUN chown -R ${USERNAME} ${WORKSPACE}
+
+USER ${USERNAME}
+
+RUN echo "source ${WORKSPACE}/install/setup.bash" >> /home/$USERNAME/.bashrc \
+	&& echo "# export RCUTILS_CONSOLE_OUTPUT_FORMAT=\"[{severity}] [{name}]: {message} ({function_name}() at {file_name}:{line_number}) [{time}]\""  >> /home/$USERNAME/.bashrc \
+	&& echo "# export RCUTILS_CONSOLE_OUTPUT_FORMAT=\"[{severity}] [{name}]: {message}\""  >> /home/$USERNAME/.bashrc \ 
+  && vcs import < src/ros2.repos src \ 
+  && sed -i '2,5d' src/turtlebot3/turtlebot3.repos \
+  && vcs import < src/turtlebot3/turtlebot3.repos src \ 
+  && vcs import < src/turtlebot3/turtlebot3_ci.repos src \ 
+  && ./scripts/setup.bash \ 
+  && ./scripts/full_build.bash
+
+# TODO: Include git repo to build smap pkgs
 
 ENTRYPOINT ["/sbin/entrypoint.bash"]
 CMD ["bash"]
