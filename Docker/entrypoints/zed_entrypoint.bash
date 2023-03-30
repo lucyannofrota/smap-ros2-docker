@@ -4,6 +4,17 @@ set -e
 
 cd $WORKSPACE
 
+
+/bin/bash -c "source /opt/ros/$ROS_DISTRO/setup.bash && \
+  rosdep install --from-paths src --ignore-src -r -y && \
+  colcon build --parallel-workers $(nproc) --symlink-install \
+  --event-handlers console_direct+ --base-paths src \
+  --cmake-args ' -DCMAKE_BUILD_TYPE=Release' \
+  ' -DCMAKE_LIBRARY_PATH=/usr/local/cuda/lib64/stubs' \
+  ' -DCMAKE_CXX_FLAGS="-Wl,--allow-shlib-undefined"' "
+
+. install/setup.bash
+
 # setup ros2 environment
 source "/opt/ros/$ROS_DISTRO/setup.bash" --
 source "$WORKSPACE/install/local_setup.bash" --
@@ -41,6 +52,11 @@ echo "Entrypoint: " | sed 's/^/  /'
 echo "Host Path: " $ENTRYPOINT_HOST_PATH | sed 's/^/  /' | sed 's/^/  /'
 
 echo "------------------------------" | sed 's/^/  /'
+
+echo "------------------------------" | sed 's/^/  /'
+
+echo "smap pkgs:" | sed 's/^/  /'
+ros2 pkg list | grep smap | sed 's/^/  /' | sed 's/^/  /'
 
 echo "------------------------------" | sed 's/^/  /'
 

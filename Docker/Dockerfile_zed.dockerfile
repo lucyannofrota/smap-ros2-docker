@@ -4,7 +4,7 @@ ARG IMAGE_NAME=nvidia/cuda:11.4.1-devel-ubuntu20.04
 ARG UBUNTU_VERSION=20.04
 ARG CUDA_VERSION=11.4.1
 
-FROM ${IMAGE_NAME}
+FROM ${IMAGE_NAME} as zed
 
 # Base Image
 ENV IMAGE_NAME=${IMAGE_NAME}
@@ -148,6 +148,8 @@ RUN /bin/bash -c "source /opt/ros/$ROS_DISTRO/setup.bash && \
 
 
 #USER ${USERNAME}
+
+FROM zed as setup
 
 COPY /scripts ${WORKSPACE}/scripts
 COPY ${ENTRYPOINT_HOST_PATH} /sbin/entrypoint.bash
