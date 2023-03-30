@@ -61,7 +61,7 @@ services:
     command: >
       bash -c "
         export ROS_DOMAIN_ID=7 && 
-        RMW_IMPLEMENTATION=rmw_cyclonedds_cpp ROS_DOMAIN_ID=7 ros2 launch zed_wrapper zed2.launch.py publish_tf:=false
+        RMW_IMPLEMENTATION=rmw_cyclonedds_cpp ROS_DOMAIN_ID=7 ros2 launch zed_wrapper zed2.launch.py config_path:=/workspace/config/p3dx.yaml publish_tf:=false cam_pose:=[0.0,0.0,0.91,0.0,0.0,0.0]
       "
     # TODO: Change resolution
     #RMW_IMPLEMENTATION=rmw_cyclonedds_cpp ROS_DOMAIN_ID=7 ros2 launch zed_wrapper zed2.launch.py publish_tf:=false & RMW_IMPLEMENTATION=rmw_cyclonedds_cpp ROS_DOMAIN_ID=7 ros2 run smap_sampler smap_sampler_node
