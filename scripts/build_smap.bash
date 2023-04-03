@@ -30,7 +30,7 @@ BLACKLIST+=("zed_interfaces")
 BLACKLIST+=("zed-ros2-interfaces")
 
 #smap
-BLACKLIST+=("smap_perception_yolo_v5")
+BLACKLIST+=("smap_yolo_v5")
 
 #misc
 

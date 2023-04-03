@@ -120,7 +120,7 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix # Share X11 socket with container
       - $HOME/.Xauthority:/home/ros/.Xauthority # Share X11 permissions
       #- ./src:/workspace/src
-      - ./src/smap/smap_core:/workspace/src/smap_core
+      - ./src/smap/smap_core:/workspace/src/smap/smap_core
       - ./src/smap/smap_interfaces:/workspace/src/smap/smap_interfaces
       - ./scripts:/workspace/scripts
       - ./Docker:/workspace/Docker
@@ -186,8 +186,8 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix # Share X11 socket with container
       - $HOME/.Xauthority:/home/ros/.Xauthority # Share X11 permissions
       - ./src/smap/smap_interfaces:/workspace/src/smap/smap_interfaces
-      - ./src/smap/smap_classification_wrapper:/workspace/src/smap/smap_classification_wrapper
-      - ./src/smap/smap_perception_yolo_v5:/workspace/src/smap/smap_perception_yolo_v5
+      - ./src/smap/smap_perception_wrapper:/workspace/src/smap/smap_perception_wrapper
+      - ./src/smap/smap_yolo_v5:/workspace/src/smap/smap_yolo_v5
     cap_add:
       - SYS_PTRACE
     command: > 
@@ -205,8 +205,8 @@ services:
     image: smap:torch-yolov5
     container_name: smap-torch-yolov5
     healthcheck:
-      test: ["CMD", "bash", "-c", ". /workspace/install/setup.bash; ros2 pkg list | grep -q smap_perception_yolo_v5"]
-      #test: ["CMD-SHELL", "ros2 pkg list | grep -q smap_perception_yolo_v5"]
+      test: ["CMD", "bash", "-c", ". /workspace/install/setup.bash; ros2 pkg list | grep -q smap_yolo_v5"]
+      #test: ["CMD-SHELL", "ros2 pkg list | grep -q smap_yolo_v5"]
       #test: ["CMD", "bash", "-c", "ps -a | grep -q smap_sampler"]
       start_period: 1m
       interval: 5s
@@ -260,17 +260,17 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix # Share X11 socket with container
       - $HOME/.Xauthority:/home/ros/.Xauthority # Share X11 permissions
       - ./src/smap/smap_interfaces:/workspace/src/smap/smap_interfaces
-      - ./src/smap/smap_perception/smap_classification_wrapper:/workspace/src/smap/smap_classification_wrapper
-      - ./src/smap/smap_perception/detectors/smap_perception_yolo_v5:/workspace/src/smap/smap_perception_yolo_v5
+      - ./src/smap/smap_perception/smap_perception_wrapper:/workspace/src/smap/smap_perception_wrapper
+      - ./src/smap/smap_perception/detectors/smap_yolo_v5:/workspace/src/smap/smap_yolo_v5
     cap_add:
       - SYS_PTRACE
     command: > 
       bash -c "
         tail -F /dev/null
       "
-    #jupyter-lab --no-browser --notebook-dir=src/smap/smap_perception_yolo_v5/notebooks/yolo_v5 --NotebookApp.token='' --NotebookApp.password='' --NotebookApp.username=''; 
-    #ros2 run smap_perception_yolo_v5 yolo_v5.py ; 
-    #jupyter-lab --no-browser --notebook-dir=src/smap/smap_perception_yolo_v5/notebooks ;
+    #jupyter-lab --no-browser --notebook-dir=src/smap/smap_yolo_v5/notebooks/yolo_v5 --NotebookApp.token='' --NotebookApp.password='' --NotebookApp.username=''; 
+    #ros2 run smap_yolo_v5 yolo_v5.py ; 
+    #jupyter-lab --no-browser --notebook-dir=src/smap/smap_yolo_v5/notebooks ;
     #bash -c "tail -F /dev/null"
       
     deploy:

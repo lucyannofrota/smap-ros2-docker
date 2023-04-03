@@ -7,8 +7,8 @@ cd $WORKSPACE
 # Downloading repos
 (
         rm -r -f build install log | sed 's/^/  /'
-        cd $WORKSPACE/src/smap/smap_perception_yolo_v5
-        vcs import < smap_perception_yolo_v5.repos
+        cd $WORKSPACE/src/smap/smap_yolo_v5
+        vcs import < smap_yolo_v5.repos
         cd yolov5
 
         # File
@@ -36,14 +36,14 @@ cd $WORKSPACE
         # Should be executed just once
         #while read in; do (grep -qaexF $in ../.gitignore || echo ${in}\ ) >> ../.gitignore; done < .gitignore
 
-        rm -fr $WORKSPACE/src/smap/smap_perception_yolo_v5/yolov5
+        rm -fr $WORKSPACE/src/smap/smap_yolo_v5/yolov5
 
-        cd $WORKSPACE/src/smap/smap_perception_yolo_v5
+        cd $WORKSPACE/src/smap/smap_yolo_v5
 
         pip install -qr requirements.txt
-        rm -fr $WORKSPACE/src/smap/smap_perception_yolo_v5/weights
+        rm -fr $WORKSPACE/src/smap/smap_yolo_v5/weights
         mkdir weights
-        cd $WORKSPACE/src/smap/smap_perception_yolo_v5/weights
+        cd $WORKSPACE/src/smap/smap_yolo_v5/weights
         python3 ../export.py --weights yolov5s.pt --include torchscript --device 0 --inplace --imgsz 640 --data ../data/coco128.yaml
 
         cd $WORKSPACE

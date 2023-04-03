@@ -238,10 +238,10 @@ USER ${USERNAME}
 
 RUN pip install jupyterlab \
   && pip install -U tensorboard \
-  && mkdir -p ${WORKSPACE}/src/smap/smap_perception_yolo_v5/notebooks/yolo_v5/yolov5 \
-  && chown -R ${USERNAME} ${WORKSPACE}/src/smap/smap_perception_yolo_v5/notebooks/yolo_v5/yolov5 \ 
-  && mkdir -p ${WORKSPACE}/src/smap/smap_perception_yolo_v5/notebooks/yolo_v5/datasets \
-  && chown -R ${USERNAME} ${WORKSPACE}/src/smap/smap_perception_yolo_v5/notebooks/yolo_v5/datasets
+  && mkdir -p ${WORKSPACE}/src/smap/smap_yolo_v5/notebooks/yolo_v5/yolov5 \
+  && chown -R ${USERNAME} ${WORKSPACE}/src/smap/smap_yolo_v5/notebooks/yolo_v5/yolov5 \ 
+  && mkdir -p ${WORKSPACE}/src/smap/smap_yolo_v5/notebooks/yolo_v5/datasets \
+  && chown -R ${USERNAME} ${WORKSPACE}/src/smap/smap_yolo_v5/notebooks/yolo_v5/datasets
 
 # Dev
 
@@ -253,6 +253,6 @@ RUN pip install jupyterlab \
 # Deploy
 
 #RUN git clone --recursive https://github.com/lucyannofrota/smap_interfaces.git ${WORKSPACE}/src/smap_interfaces \
-#  && git clone --recursive https://github.com/lucyannofrota/smap_classification_wrapper.git ${WORKSPACE}/src/smap_classification_wrapper \
-#  && git clone --recursive https://github.com/lucyannofrota/smap_perception_yolo_v5.git ${WORKSPACE}/src/smap_perception_yolo_v5
+#  && git clone --recursive https://github.com/lucyannofrota/smap_perception_wrapper.git ${WORKSPACE}/src/smap_perception_wrapper \
+#  && git clone --recursive https://github.com/lucyannofrota/smap_yolo_v5.git ${WORKSPACE}/src/smap_yolo_v5
 
