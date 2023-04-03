@@ -11,8 +11,9 @@ services:
     container_name: zed-wrapper
     healthcheck:
       #test: ["CMD-SHELL", "ps -a | grep -q smap_sampler"]
-      test: ["CMD-SHELL", ". install/setup.bash; ros2 node list | grep -q /smap_sampler_node"]
-      #test: ["CMD", "bash", "-c", "ps -a | grep -q smap_sampler"]
+      #bash -c ""
+      #test: ["CMD-SHELL", ". /workspace/install/setup.bash; ros2 node list | grep -q /smap_sampler_node"]
+      test: ["CMD", "bash", "-c", ". /workspace/install/setup.bash; ros2 node list | grep -q /smap_sampler_node"]
       start_period: 1m
       interval: 5s
       timeout: 1s
@@ -118,7 +119,9 @@ services:
     volumes: 
       - /tmp/.X11-unix:/tmp/.X11-unix # Share X11 socket with container
       - $HOME/.Xauthority:/home/ros/.Xauthority # Share X11 permissions
-      - ./src:/workspace/src
+      #- ./src:/workspace/src
+      - ./src/smap/smap_core:/workspace/src/smap_core
+      - ./src/smap/smap_interfaces:/workspace/src/smap/smap_interfaces
       - ./scripts:/workspace/scripts
       - ./Docker:/workspace/Docker
     cap_add:
@@ -202,7 +205,8 @@ services:
     image: smap:torch-yolov5
     container_name: smap-torch-yolov5
     healthcheck:
-      test: ["CMD-SHELL", "ros2 pkg list | grep -q smap_perception_yolo_v5"]
+      test: ["CMD", "bash", "-c", ". /workspace/install/setup.bash; ros2 pkg list | grep -q smap_perception_yolo_v5"]
+      #test: ["CMD-SHELL", "ros2 pkg list | grep -q smap_perception_yolo_v5"]
       #test: ["CMD", "bash", "-c", "ps -a | grep -q smap_sampler"]
       start_period: 1m
       interval: 5s
@@ -258,8 +262,6 @@ services:
       - ./src/smap/smap_interfaces:/workspace/src/smap/smap_interfaces
       - ./src/smap/smap_perception/smap_classification_wrapper:/workspace/src/smap/smap_classification_wrapper
       - ./src/smap/smap_perception/detectors/smap_perception_yolo_v5:/workspace/src/smap/smap_perception_yolo_v5
-      - torch-yolov5:/workspace/src/smap/smap_perception_yolo_v5/notebooks/yolo_v5/yolov5
-      - datasets:/workspace/src/smap/smap_perception_yolo_v5/notebooks/yolo_v5/datasets
     cap_add:
       - SYS_PTRACE
     command: > 
