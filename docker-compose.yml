@@ -256,8 +256,8 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix # Share X11 socket with container
       - $HOME/.Xauthority:/home/ros/.Xauthority # Share X11 permissions
       - ./src/smap/smap_interfaces:/workspace/src/smap/smap_interfaces
-      - ./src/smap/smap_classification_wrapper:/workspace/src/smap/smap_classification_wrapper
-      - ./src/smap/smap_perception_yolo_v5:/workspace/src/smap/smap_perception_yolo_v5
+      - ./src/smap/smap_perception/smap_classification_wrapper:/workspace/src/smap/smap_classification_wrapper
+      - ./src/smap/smap_perception/detectors/smap_perception_yolo_v5:/workspace/src/smap/smap_perception_yolo_v5
       - torch-yolov5:/workspace/src/smap/smap_perception_yolo_v5/notebooks/yolo_v5/yolov5
       - datasets:/workspace/src/smap/smap_perception_yolo_v5/notebooks/yolo_v5/datasets
     cap_add:
