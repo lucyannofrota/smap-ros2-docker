@@ -10,7 +10,8 @@ services:
     image: smap:zed-wrapper
     container_name: zed-wrapper
     healthcheck:
-      test: ["CMD-SHELL", "ps -a | grep -q smap_sampler"]
+      #test: ["CMD-SHELL", "ps -a | grep -q smap_sampler"]
+      test: ["CMD-SHELL", ". install/setup.bash; ros2 node list | grep -q /smap_sampler_node"]
       #test: ["CMD", "bash", "-c", "ps -a | grep -q smap_sampler"]
       start_period: 1m
       interval: 5s
@@ -125,7 +126,6 @@ services:
     command: > 
       bash -c 
       "
-        ros2 run smap_core classification_component_node.py ;
         tail -F /dev/null
       "
     #ros2 run smap_core classification_component_node.py ;
@@ -195,7 +195,6 @@ services:
           devices:
             - driver: nvidia
               capabilities: [gpu]
-
 
   ros2-torch-yolov5:
     user: "ros"

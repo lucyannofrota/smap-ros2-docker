@@ -41,6 +41,7 @@ cd $WORKSPACE
         cd $WORKSPACE/src/smap/smap_perception_yolo_v5
 
         pip install -qr requirements.txt
+        rm -r $WORKSPACE/src/smap/smap_perception_yolo_v5/weights
         mkdir weights
         cd $WORKSPACE/src/smap/smap_perception_yolo_v5/weights
         python3 ../export.py --weights yolov5s.pt --include torchscript --device 0 --inplace --imgsz 640 --data ../data/coco128.yaml
