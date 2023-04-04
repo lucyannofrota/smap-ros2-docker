@@ -40,11 +40,16 @@ cd $WORKSPACE
 
         cd $WORKSPACE/src/smap/smap_yolo_v5
 
-        pip install -qr requirements.txt
+        # pip install --force-reinstall -v --upgrade --upgrade-strategy only-if-needed "pandas==1.4"
+        # pip install --force-reinstall -v --upgrade --upgrade-strategy only-if-needed "numpy==1.19"
+        # pip install --force-reinstall -v --upgrade --upgrade-strategy only-if-needed "matplotlib==3.6"
+        # pip install --force-reinstall -v --upgrade --upgrade-strategy only-if-needed "scipy==1.9.3"
+        pip install --upgrade --upgrade-strategy only-if-needed -qr requirements.txt
+        pip install --upgrade --upgrade-strategy only-if-needed -qr cont_requirements.txt
         rm -fr $WORKSPACE/src/smap/smap_yolo_v5/weights
         mkdir weights
         cd $WORKSPACE/src/smap/smap_yolo_v5/weights
-        python3 ../export.py --weights yolov5s.pt --include torchscript --device 0 --inplace --imgsz 640 --data ../data/coco128.yaml
+        python3 ../export.py --weights yolov5s.pt --include torchscript engine onnx --device 0 --inplace --imgsz 640 --data ../data/coco128.yaml --opset 16
 
         cd $WORKSPACE
 )

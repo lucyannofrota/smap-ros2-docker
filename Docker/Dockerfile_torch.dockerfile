@@ -232,6 +232,14 @@ ENV TORCH_VERSION=1.12.1
 ENV TORCH_VISION_VERSION=0.13.1
 ENV TORCH_AUDIO_VERSION=0.12.1
 
+ENV cudnn_version=8.4.3.1
+ENV cuda_version=cuda11.4
+
+# Install TensorRT
+RUN python3 -m pip install --upgrade tensorrt
+#RUN python3 -m pip install --upgrade tensorrt_lean \
+#  && python3 -m pip install --upgrade tensorrt_dispatch
+
 FROM ml-torch as yolo-v5
 
 USER ${USERNAME}
