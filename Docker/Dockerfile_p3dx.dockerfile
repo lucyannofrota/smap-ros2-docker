@@ -2,6 +2,21 @@ ARG IMAGE_NAME=dustynv/ros:noetic-desktop-l4t-r35.2.1
 
 FROM ${IMAGE_NAME} as ros_aria
 
+ARG IMAGE_NAME
+ENV IMAGE_NAME=${IMAGE_NAME}
+
+ARG UBUNTU_VERSION=20.04
+ENV UBUNTU_VERSION=${UBUNTU_VERSION}
+
+ARG WORKSPACE=/workspace
+ENV WORKSPACE=${WORKSPACE}
+
+ARG ENTRYPOINT_HOST_PATH=entrypoints/p3dx_entrypoint.bash
+ENV ENTRYPOINT_HOST_PATH=${ENTRYPOINT_HOST_PATH}
+
+ARG ROS_DISTRO=noetic
+ENV ROS_DISTRO=${ROS_DISTRO}
+
 RUN git clone --recursive https://github.com/cinvesrob/Aria.git /usr/local/Aria \
   && cd /usr/local/Aria \
   && make clean \
@@ -9,9 +24,9 @@ RUN git clone --recursive https://github.com/cinvesrob/Aria.git /usr/local/Aria 
 
 FROM ros_aria as setup
 
-
-ARG ROS_DISTRO=noetic
-ENV ROS_DISTRO=${ROS_DISTRO}
+ARG ROS_DISTRO
+ARG WORKSPACE
+ARG ENTRYPOINT_HOST_PATH
 
 #ARG USERNAME=ros
 #ARG USER_UID=1000
@@ -36,14 +51,9 @@ ENV ROS_DISTRO=${ROS_DISTRO}
 
 #Add environment dependencies
 
-ARG WORKSPACE=/workspace
-ENV WORKSPACE=${WORKSPACE}
-
 RUN mkdir -p ${WORKSPACE}
 WORKDIR ${WORKSPACE}
 
-ARG ENTRYPOINT_HOST_PATH=entrypoints/p3dx_entrypoint.bash
-ENV ENTRYPOINT_HOST_PATH=${ENTRYPOINT_HOST_PATH}
 
 COPY ${ENTRYPOINT_HOST_PATH} /sbin/entrypoint.bash
 
