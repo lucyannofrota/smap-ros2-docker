@@ -1,4 +1,5 @@
-ARG IMAGE_NAME=dustynv/ros:foxy-ros-base-l4t-r35.1.0
+#ARG IMAGE_NAME=dustynv/ros:foxy-base-l4t-r35.2.1
+ARG IMAGE_NAME=dustynv/ros:foxy-ros-base-l4t-r35.2.1
 
 FROM ${IMAGE_NAME} as base_foxy
 
@@ -9,12 +10,16 @@ ARG JETPACK_MINOR=0
 ARG L4T_MAJOR=35
 ARG L4T_MINOR=1
 
-ARG ROS2_DIST=foxy       # ROS2 distribution
 
-# ZED ROS2 Wrapper dependencies version
-ARG XACRO_VERSION=2.0.6
-ARG DIAGNOSTICS_VERSION=2.0.9
-ARG AMENT_LINT_VERSION=0.12.4
+# ROS2 distribution
+ARG ROS_DISTRO=foxy
+ENV ROS_DISTRO=${ROS_DISTRO}       
+
+ARG ROS_DOMAIN_ID=7
+ENV ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
+ARG RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+ENV RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION}
+
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -49,36 +54,55 @@ RUN echo "# R${L4T_MAJOR} (release), REVISION: ${L4T_MINOR}" > /etc/nv_tegra_rel
   rm -rf ZED_SDK_Linux_JP.run && \
   rm -rf /var/lib/apt/lists/*
 
-# Install the ZED ROS2 Wrapper
-ENV ROS_DISTRO ${ROS2_DIST}
+
+FROM base_foxy as zed_wrapper
+
+
+ARG WORKSPACE=/workspace
+ARG ROS_DISTRO
 
 # Install the ZED ROS2 Wrapper
-WORKDIR /root/ros2_ws/src
-RUN git clone --recursive https://github.com/stereolabs/zed-ros2-wrapper.git
+WORKDIR /workspace/src
+
+RUN apt-get update && apt-get install -y \
+  git \
+  python3-pip \
+  python3-vcstool \
+  && printf "# List of repositories to use within your workspace\r# See https://github.com/dirk-thomas/vcstool\rrepositories:\r  zed-ros2-wrapper:\r    type: git\r    url: https://github.com/stereolabs/zed-ros2-wrapper.git\r    version: foxy-humble-v3.8\r  zed-ros2-interfaces:\r    type: git\r    url: https://github.com/stereolabs/zed-ros2-interfaces.git\r    version: foxy-humble-v3.8" > /workspace/zed_foxy.repos \
+  && vcs import < /workspace/zed_foxy.repos
 
 # Install missing dependencies
-WORKDIR /root/ros2_ws/src
+
+# ZED ROS2 Wrapper dependencies version
+ARG XACRO_VERSION=2.0.6
+ARG DIAGNOSTICS_VERSION=2.0.9
+ARG AMENT_LINT_VERSION=0.12.4
+
 RUN wget https://github.com/ros/xacro/archive/refs/tags/${XACRO_VERSION}.tar.gz -O - | tar -xvz && mv xacro-${XACRO_VERSION} xacro && \
   wget https://github.com/ros/diagnostics/archive/refs/tags/${DIAGNOSTICS_VERSION}.tar.gz -O - | tar -xvz && mv diagnostics-${DIAGNOSTICS_VERSION} diagnostics && \
   wget https://github.com/ament/ament_lint/archive/refs/tags/${AMENT_LINT_VERSION}.tar.gz -O - | tar -xvz && mv ament_lint-${AMENT_LINT_VERSION} ament-lint
   
 
-FROM base_foxy as extra-pkgs
+FROM zed_wrapper as extra-pkgs
+
+ARG ROS_DISTRO
+ARG WORKSPACE
 
 # Check that all the dependencies are satisfied
-WORKDIR /root/ros2_ws
+WORKDIR /workspace
 RUN apt-get update -y || true && rosdep update && \
   rosdep install --from-paths src --ignore-src -r -y && \
   rm -rf /var/lib/apt/lists/*
 
 # Install Ping
-RUN sudo apt-get update -y && sudo apt install iputils-ping
+# RUN sudo apt-get update -y && sudo apt install iputils-ping
 
 # Cyclone DDS already set on dustynv/ros:humble-ros-base-l4t-r35.1.0
 
 FROM extra-pkgs as configs
 
-ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+ARG ROS_DISTRO
+ARG WORKSPACE
 
 # Build the dependencies and the ZED ROS2 Wrapper
 RUN /bin/bash -c "source /opt/ros/$ROS_DISTRO/install/setup.bash && \
@@ -89,11 +113,11 @@ RUN /bin/bash -c "source /opt/ros/$ROS_DISTRO/install/setup.bash && \
   ' -DCMAKE_CXX_FLAGS="-Wl,--allow-shlib-undefined"' \
   ' --no-warn-unused-cli' "
 
-RUN mkdir /root/ros2_ws/config
-RUN cp /root/ros2_ws/src/zed-ros2-wrapper/zed_wrapper/config/common.yaml /root/ros2_ws/config/
-RUN mv /root/ros2_ws/config/common.yaml /root/ros2_ws/config/p3dx.yaml
+RUN mkdir /workspace/config
+RUN cp /workspace/src/zed-ros2-wrapper/zed_wrapper/config/common.yaml /workspace/config/
+RUN mv /workspace/config/common.yaml /workspace/config/p3dx.yaml
 
-WORKDIR /root/ros2_ws
+WORKDIR /workspace
 
 # Setup environment variables
 #COPY ros_entrypoint_jetson.sh /sbin/ros_entrypoint.sh

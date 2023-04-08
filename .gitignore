@@ -1,7 +1,8 @@
 /.Trash-1000
 /backups
+/.backups
 /lost+found
 /test_git
 installed_containers.md
 /containers/*
-/dustry-nv/*
+/dustry-nv
