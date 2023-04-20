@@ -20,7 +20,7 @@ cd $WORKSPACE
 # setup ros2 environment
 (
         ./scripts/setup.bash | sed 's/^/  /'
-        ./scripts/build_smap.bash | sed 's/^/  /'
+        ./scripts/full_build.bash | sed 's/^/  /'
 )
 
 . install/setup.bash

@@ -2,7 +2,7 @@
 echo "---<full_build.bash>---"
 set -e
 
-source /opt/ros/foxy/setup.bash
+source /opt/ros/foxy/install/setup.bash
 
 colcon build \
         --merge-install \
