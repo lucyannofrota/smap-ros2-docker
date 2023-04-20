@@ -1,3 +1,8 @@
 [submodule "dusty-nv"]
 	path = dusty-nv
 	url = https://github.com/dusty-nv/jetson-containers.git
+
+[submodule "p3dx-docker"]
+	path = p3dx-docker
+	url = https://github.com/lucyannofrota/p3dx-docker.git
+	
