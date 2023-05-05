@@ -139,6 +139,45 @@ services:
             - driver: nvidia
               capabilities: [gpu]
 
+  ros2-nav2:
+    user: "ros"
+    network_mode: "host"
+    image: smap:env
+    container_name: smap-nav2
+
+    privileged: true
+    # Not necessary when running in host network mode.
+    #ports:
+    #  - 8080:8080 # Passthrough for Jupyter Notebook
+    #  - 1234:1234 # Passthrough for SSH
+    environment:
+      - "DISPLAY"
+      - "QT_X11_NO_MITSHM=1" #fix some QT bugs
+      - "ROS_DOMAIN_ID=5"
+    volumes: 
+      - /tmp/.X11-unix:/tmp/.X11-unix # Share X11 socket with container
+      - $HOME/.Xauthority:/home/ros/.Xauthority # Share X11 permissions
+      - ./src/smap/smap_core:/workspace/src/smap/smap_core
+      - ./src/smap/smap_interfaces:/workspace/src/smap/smap_interfaces
+      - ./scripts:/workspace/scripts
+      - ./src/P3DX:/workspace/src/P3DX
+    cap_add:
+      - SYS_PTRACE
+    command: >
+      bash -c 
+      "
+        ./scripts/build_smap.bash && 
+        tail -F /dev/null
+      "
+    #ros2 run smap_core classification_component_node.py ;
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+
+
   ros2-torch:
     user: "ros"
     network_mode: "host"
