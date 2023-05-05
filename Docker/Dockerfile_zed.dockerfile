@@ -157,10 +157,13 @@ RUN cp $WORKSPACE/src/zed-ros2-wrapper/zed_wrapper/config/common.yaml $WORKSPACE
 RUN mv $WORKSPACE/config/common.yaml $WORKSPACE/config/p3dx.yaml
 RUN sed -i 's/set_as_static: false/set_as_static: true/g' $WORKSPACE/config/p3dx.yaml && \
     sed -i 's/two_d_mode: false/two_d_mode: true/g' $WORKSPACE/config/p3dx.yaml && \
-    sed -i 's/odometry_frame: "odom"/odometry_frame: "odom_zed2"/g' $WORKSPACE/config/p3dx.yaml
-    #sed -i 's/grab_resolution: \'HD720\' /grab_resolution: \'HD720\' /g' $WORKSPACE/config/p3dx.yaml
-    #sed -i 's/pub_resolution: \'MEDIUM\' /pub_resolution: \'MEDIUM\' /g' $WORKSPACE/config/p3dx.yaml
-
+    sed -i 's/odometry_frame: "odom"/odometry_frame: "odom_zed2"/g' $WORKSPACE/config/p3dx.yaml && \
+    sed -i 's/quality: 1/quality: 2/g' $WORKSPACE/config/p3dx.yaml && \
+    sed -i 's/HD720/VGA/g' $WORKSPACE/config/p3dx.yaml && \
+    sed -i 's/MEDIUM/VGA/g' $WORKSPACE/config/p3dx.yaml && \
+    sed -i 's/grab_frame_rate: 15/grab_frame_rate: 10 /g' $WORKSPACE/config/p3dx.yaml && \
+    sed -i 's/pub_frame_rate: 15.0 /pub_frame_rate: 10.0 /g' $WORKSPACE/config/p3dx.yaml && \
+    sed -i 's/point_cloud_freq: 15.0 /point_cloud_freq: 10.0 /g' $WORKSPACE/config/p3dx.yaml
 
 
 
