@@ -2,58 +2,73 @@
 echo "---<torch_entrypoint.bash>---"
 set -e
 
+cd $WORKSPACE/src/smap/smap_yolo_v5
+
+rm -f $WORKSPACE/tmp/COLCON_IGNORE
+cp -R $WORKSPACE/tmp/* $WORKSPACE/src/smap/smap_yolo_v5
+touch $WORKSPACE/tmp/COLCON_IGNORE
+
+cd $WORKSPACE/src/smap/smap_yolo_v5
+
+rm -fr weights
+mkdir -p weights
+cd weights
+python3 ../export.py --weights yolov5s.pt --include engine --device 0 --inplace --imgsz 640 --data ../data/coco128.yaml --opset 16
+# rm -rf $WORKSPACE/src/smap/smap_yolo_v5/tmp
+
 cd $WORKSPACE
 
 # Downloading repos
-(
-        rm -r -f build install log | sed 's/^/  /'
-        cd $WORKSPACE/src/smap/smap_yolo_v5
-        vcs import < smap_yolo_v5.repos
-        cd yolov5
+# (
+#         rm -r -f build install log | sed 's/^/  /'
+#         cd $WORKSPACE/src/smap/smap_yolo_v5
+#         vcs import < smap_yolo_v5.repos
+#         cd yolov5
 
-        # File
-        find  . -maxdepth 1 -type f ! \( -ipath '*.md' -o -ipath '*.git*' -o -ipath '*grep*' -o -ipath '*ignore' -o -name '.' -o -name '.pre-commit-config.yaml' -o -name '__init__.py' \) > .gitignore_f
-        while read file; do (echo "${file}" | cut -c 3-) >> .gitignore_f_; done < .gitignore_f
-        while read file; do (cp $file ../$file); done < .gitignore_f_
+#         # File
+#         find  . -maxdepth 1 -type f ! \( -ipath '*.md' -o -ipath '*.git*' -o -ipath '*grep*' -o -ipath '*ignore' -o -name '.' -o -name '.pre-commit-config.yaml' -o -name '__init__.py' \) > .gitignore_f
+#         while read file; do (echo "${file}" | cut -c 3-) >> .gitignore_f_; done < .gitignore_f
+#         while read file; do (cp $file ../$file); done < .gitignore_f_
 
-        # Dir
-        find  . -maxdepth 1 -type d ! \( -ipath '*.md' -o -ipath '*.git*' -o -ipath '*grep*' -o -ipath '*ignore' -o -name '.' \) > .gitignore_d
-        #while read folder; do (cut -c 3-) >> .gitignore_d_; done < .gitignore_d
-        cut -c 3- .gitignore_d > .gitignore_d_
-        while read folder; do (cp -r --parents $folder ./..); done < .gitignore_d_
-        while read folder; do (echo "${folder}/*") >> .gitignore_d__; done < .gitignore_d_
+#         # Dir
+#         find  . -maxdepth 1 -type d ! \( -ipath '*.md' -o -ipath '*.git*' -o -ipath '*grep*' -o -ipath '*ignore' -o -name '.' \) > .gitignore_d
+#         #while read folder; do (cut -c 3-) >> .gitignore_d_; done < .gitignore_d
+#         cut -c 3- .gitignore_d > .gitignore_d_
+#         while read folder; do (cp -r --parents $folder ./..); done < .gitignore_d_
+#         while read folder; do (echo "${folder}/*") >> .gitignore_d__; done < .gitignore_d_
 
-        # Merging .gitignore
-        printf "\n" >> .gitignore
-        echo "## ultralytics/yolov5" >> .gitignore
-        printf "\n" >> .gitignore
-        echo "# Files" >> .gitignore
-        while read in; do ( echo ${in}\ ) >> .gitignore; done < .gitignore_f_
-        printf "\n" >> .gitignore
-        echo "# Folders" >> .gitignore
-        while read in; do ( echo ${in}\ ) >> .gitignore; done < .gitignore_d__
+#         # Merging .gitignore
+#         printf "\n" >> .gitignore
+#         echo "## ultralytics/yolov5" >> .gitignore
+#         printf "\n" >> .gitignore
+#         echo "# Files" >> .gitignore
+#         while read in; do ( echo ${in}\ ) >> .gitignore; done < .gitignore_f_
+#         printf "\n" >> .gitignore
+#         echo "# Folders" >> .gitignore
+#         while read in; do ( echo ${in}\ ) >> .gitignore; done < .gitignore_d__
 
-        # Should be executed just once
-        #while read in; do (grep -qaexF $in ../.gitignore || echo ${in}\ ) >> ../.gitignore; done < .gitignore
+#         # Should be executed just once
+#         #while read in; do (grep -qaexF $in ../.gitignore || echo ${in}\ ) >> ../.gitignore; done < .gitignore
 
-        rm -fr $WORKSPACE/src/smap/smap_yolo_v5/yolov5
+#         rm -fr $WORKSPACE/src/smap/smap_yolo_v5/yolov5
 
-        cd $WORKSPACE/src/smap/smap_yolo_v5
+#         cd $WORKSPACE/src/smap/smap_yolo_v5
 
-        # pip install --force-reinstall -v --upgrade --upgrade-strategy only-if-needed "pandas==1.4"
-        # pip install --force-reinstall -v --upgrade --upgrade-strategy only-if-needed "numpy==1.19"
-        # pip install --force-reinstall -v --upgrade --upgrade-strategy only-if-needed "matplotlib==3.6"
-        # pip install --force-reinstall -v --upgrade --upgrade-strategy only-if-needed "scipy==1.9.3"
-        pip install --upgrade --upgrade-strategy only-if-needed -qr requirements.txt
-        pip install --upgrade --upgrade-strategy only-if-needed -qr cont_requirements.txt
-        rm -fr $WORKSPACE/src/smap/smap_yolo_v5/weights
-        mkdir weights
-        cd $WORKSPACE/src/smap/smap_yolo_v5/weights
-        python3 ../export.py --weights yolov5s.pt --include torchscript engine onnx --device 0 --inplace --imgsz 640 --data ../data/coco128.yaml --opset 16
+#         # pip install --force-reinstall -v --upgrade --upgrade-strategy only-if-needed "pandas==1.4"
+#         # pip install --force-reinstall -v --upgrade --upgrade-strategy only-if-needed "numpy==1.19"
+#         # pip install --force-reinstall -v --upgrade --upgrade-strategy only-if-needed "matplotlib==3.6"
+#         # pip install --force-reinstall -v --upgrade --upgrade-strategy only-if-needed "scipy==1.9.3"
+#         pip install --upgrade --upgrade-strategy only-if-needed -qr requirements.txt
+#         pip install --upgrade --upgrade-strategy only-if-needed -qr cont_requirements.txt
+#         rm -fr $WORKSPACE/src/smap/smap_yolo_v5/weights
+#         mkdir weights
+#         cd $WORKSPACE/src/smap/smap_yolo_v5/weights
+#         python3 ../export.py --weights yolov5s.pt --include torchscript engine onnx --device 0 --inplace --imgsz 640 --data ../data/coco128.yaml --opset 16
 
-        cd $WORKSPACE
-)
+#         cd $WORKSPACE
+# )
 # setup ros2 environment
+cd $WORKSPACE
 (
         ./scripts/setup.bash | sed 's/^/  /' && ./scripts/full_build.bash | sed 's/^/  /'
 )
@@ -73,9 +88,9 @@ echo "OpenGL: " $GL_VERSION | sed 's/^/  /' | sed 's/^/  /'
 echo "------------------------------" | sed 's/^/  /'
 
 echo "ROS:" | sed 's/^/  /' | sed 's/^/  /'
-echo "Distro: " $ROS_DISTRO | sed 's/^/  /' | sed 's/^/  /'
-echo "Domain ID: " $ROS_DOMAIN_ID | sed 's/^/  /' | sed 's/^/  /'
-echo "DDS middleware: " $RMW_IMPLEMENTATION | sed 's/^/  /' | sed 's/^/  /'
+echo "Distro: " $ROS_DISTRO | sed 's/^/  /' | sed 's/^/  /' | sed 's/^/  /'
+echo "Domain ID: " $ROS_DOMAIN_ID | sed 's/^/  /' | sed 's/^/  /' | sed 's/^/  /'
+echo "DDS middleware: " $RMW_IMPLEMENTATION | sed 's/^/  /' | sed 's/^/  /' | sed 's/^/  /'
 echo "WORKSPACE: " $WORKSPACE | sed 's/^/  /' | sed 's/^/  /'
 
 echo "------------------------------" | sed 's/^/  /'

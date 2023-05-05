@@ -62,10 +62,9 @@ services:
       - SYS_PTRACE
     command: >
       bash -c "
-        export ROS_DOMAIN_ID=7 && 
-        RMW_IMPLEMENTATION=rmw_cyclonedds_cpp ROS_DOMAIN_ID=7 ros2 launch zed_wrapper zed2.launch.py config_path:=/workspace/config/p3dx.yaml publish_tf:=false cam_pose:=[0.0,0.0,0.91,0.0,0.0,0.0]
+        ros2 launch zed_wrapper zed2.launch.py config_path:=/workspace/config/p3dx.yaml publish_tf:=false cam_pose:=[0.0,0.0,0.91,0.0,0.0,0.0] & 
+        (sleep 20 && ros2 run smap_sampler smap_sampler_node)
       "
-    # TODO: Change resolution
     #RMW_IMPLEMENTATION=rmw_cyclonedds_cpp ROS_DOMAIN_ID=7 ros2 launch zed_wrapper zed2.launch.py publish_tf:=false & RMW_IMPLEMENTATION=rmw_cyclonedds_cpp ROS_DOMAIN_ID=7 ros2 run smap_sampler smap_sampler_node
 
     deploy:
@@ -126,9 +125,10 @@ services:
       - ./Docker:/workspace/Docker
     cap_add:
       - SYS_PTRACE
-    command: > 
+    command: >
       bash -c 
       "
+        ros2 run smap_core perception_server_node.py && 
         tail -F /dev/null
       "
     #ros2 run smap_core classification_component_node.py ;
@@ -300,13 +300,19 @@ services:
       - $HOME/.Xauthority:/home/ros/.Xauthority # Share X11 permissions
       - ./src/smap/smap_interfaces:/workspace/src/smap/smap_interfaces
       - ./src/smap/smap_perception/smap_perception_wrapper:/workspace/src/smap/smap_perception_wrapper
-      - ./src/smap/smap_perception/detectors/smap_yolo_v5:/workspace/src/smap/smap_yolo_v5
+      - ./src/smap/smap_perception/detectors/smap_yolo_v5:/workspace/tmp
+      #/src/smap/smap_yolo_v5/tmp
     cap_add:
       - SYS_PTRACE
-    command: > 
+    command: >
       bash -c "
         tail -F /dev/null
       "
+
+    # ros2 launch smap_yolo_v5 yolov5_launch.py
+
+
+    #ros2 run smap_yolo_v5 yolo_v5_node.py && 
     #jupyter-lab --no-browser --notebook-dir=src/smap/smap_yolo_v5/notebooks/yolo_v5 --NotebookApp.token='' --NotebookApp.password='' --NotebookApp.username=''; 
     #ros2 run smap_yolo_v5 yolo_v5.py ; 
     #jupyter-lab --no-browser --notebook-dir=src/smap/smap_yolo_v5/notebooks ;

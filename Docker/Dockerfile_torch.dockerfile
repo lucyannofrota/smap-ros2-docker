@@ -123,6 +123,7 @@ RUN apt-get update && apt-get install -y \
   ros-${ROS_DISTRO}-launch-testing \
   ros-${ROS_DISTRO}-launch-testing-ament-cmake \
   ros-${ROS_DISTRO}-launch-testing-ros \
+  ros-${ROS_DISTRO}-sensor-msgs-py \
   python3-autopep8 \
   && rm -rf /var/lib/apt/lists/* \
   && rosdep init || echo "rosdep already initialized" \
@@ -173,28 +174,26 @@ ENV NVIDIA_VISIBLE_DEVICES all
 # ENV NVIDIA_DRIVER_CAPABILITIES graphics,utility,compute
 ENV QT_X11_NO_MITSHM 1
 
-FROM nvidia as env-setup
+# FROM nvidia as env-setup
 
-ENV RCUTILS_LOGGING_USE_STDOUT=1
-ENV RCUTILS_LOGGING_BUFFERED_STREAM=1
-ENV RCUTILS_COLORIZED_OUTPUT=1
+# ENV RCUTILS_LOGGING_USE_STDOUT=1
+# ENV RCUTILS_LOGGING_BUFFERED_STREAM=1
+# ENV RCUTILS_COLORIZED_OUTPUT=1
 
-RUN echo "source ${WORKSPACE}/install/setup.bash" >> /home/$USERNAME/.bashrc \
-	&& echo "# export RCUTILS_CONSOLE_OUTPUT_FORMAT=\"[{severity}] [{name}]: {message} ({function_name}() at {file_name}:{line_number}) [{time}]\""  >> /home/$USERNAME/.bashrc \
-	&& echo "# export RCUTILS_CONSOLE_OUTPUT_FORMAT=\"[{severity}] [{name}]: {message}\""  >> /home/$USERNAME/.bashrc
+# RUN echo "source ${WORKSPACE}/install/setup.bash" >> /home/$USERNAME/.bashrc \
+# 	&& echo "# export RCUTILS_CONSOLE_OUTPUT_FORMAT=\"[{severity}] [{name}]: {message} ({function_name}() at {file_name}:{line_number}) [{time}]\""  >> /home/$USERNAME/.bashrc \
+# 	&& echo "# export RCUTILS_CONSOLE_OUTPUT_FORMAT=\"[{severity}] [{name}]: {message}\""  >> /home/$USERNAME/.bashrc
 
-RUN mkdir -p ${WORKSPACE}
-WORKDIR ${WORKSPACE}
+# RUN mkdir -p ${WORKSPACE}
+# WORKDIR ${WORKSPACE}
 
-COPY /scripts ${WORKSPACE}/scripts
-COPY ${ENTRYPOINT_HOST_PATH} /sbin/entrypoint.bash
+# COPY /scripts ${WORKSPACE}/scripts
+# COPY ${ENTRYPOINT_HOST_PATH} /sbin/entrypoint.bash
 
-RUN mkdir src && sudo chown -R ${USERNAME} ${WORKSPACE}
+# RUN mkdir src && sudo chown -R ${USERNAME} ${WORKSPACE}
 
-ENTRYPOINT ["/sbin/entrypoint.bash"]
-CMD ["bash"]
-
-
+# ENTRYPOINT ["/sbin/entrypoint.bash"]
+# CMD ["bash"]
 
 
 
@@ -224,9 +223,13 @@ CMD ["bash"]
 
 
 
-FROM env-setup as ml-torch
+
+
+FROM nvidia as ml-torch
 
 RUN pip install torch==${PYTORCH}+${TORCH_CUDA} torchvision==${TORCH_VISION}+${TORCH_CUDA} torchaudio==${TORCH_AUDIO} --extra-index-url https://download.pytorch.org/whl/cu113
+# pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113
+# pip install --dry-run torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113
 
 ENV TORCH_VERSION=1.12.1
 ENV TORCH_VISION_VERSION=0.13.1
@@ -242,14 +245,47 @@ RUN python3 -m pip install --upgrade tensorrt
 
 FROM ml-torch as yolo-v5
 
-USER ${USERNAME}
+COPY Docker/entrypoints/ultralitics_yolo_v5_install.bash /sbin/ultralitics_yolo_v5_install.bash
+
+RUN chown ${USERNAME} /sbin/ultralitics_yolo_v5_install.bash && \
+  chmod 777 /sbin/ultralitics_yolo_v5_install.bash
 
 RUN pip install jupyterlab \
-  && pip install -U tensorboard \
-  && mkdir -p ${WORKSPACE}/src/smap/smap_yolo_v5/notebooks/yolo_v5/yolov5 \
+  && pip install -U tensorboard
+
+WORKDIR ${WORKSPACE}
+
+COPY /scripts ${WORKSPACE}/scripts
+COPY ${ENTRYPOINT_HOST_PATH} /sbin/entrypoint.bash
+
+RUN mkdir src && chown -R ${USERNAME} ${WORKSPACE}
+
+USER ${USERNAME}
+
+ENV RCUTILS_LOGGING_USE_STDOUT=1
+ENV RCUTILS_LOGGING_BUFFERED_STREAM=1
+ENV RCUTILS_COLORIZED_OUTPUT=1
+
+RUN echo "source ${WORKSPACE}/install/setup.bash" >> /home/$USERNAME/.bashrc \
+	&& echo "# export RCUTILS_CONSOLE_OUTPUT_FORMAT=\"[{severity}] [{name}]: {message} ({function_name}() at {file_name}:{line_number}) [{time}]\""  >> /home/$USERNAME/.bashrc \
+	&& echo "# export RCUTILS_CONSOLE_OUTPUT_FORMAT=\"[{severity}] [{name}]: {message}\""  >> /home/$USERNAME/.bashrc
+
+# RUN mkdir -p ${WORKSPACE}
+
+
+ENTRYPOINT ["/sbin/entrypoint.bash"]
+CMD ["bash"]
+
+RUN mkdir -p ${WORKSPACE}/src/smap/smap_yolo_v5/notebooks/yolo_v5/yolov5 \
   && chown -R ${USERNAME} ${WORKSPACE}/src/smap/smap_yolo_v5/notebooks/yolo_v5/yolov5 \ 
   && mkdir -p ${WORKSPACE}/src/smap/smap_yolo_v5/notebooks/yolo_v5/datasets \
   && chown -R ${USERNAME} ${WORKSPACE}/src/smap/smap_yolo_v5/notebooks/yolo_v5/datasets
+
+RUN  /sbin/ultralitics_yolo_v5_install.bash
+
+
+# RUN /sbin/ultralitics_yolo_v5_install.bash
+
 
 # Dev
 
