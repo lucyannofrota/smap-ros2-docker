@@ -46,8 +46,9 @@ done
 colcon build \
         --merge-install \
         --symlink-install \
+        --continue-on-error \
         --packages-select ${PKG_LIST[@]} \
-        --cmake-args "-DCMAKE_BUILD_TYPE=RelWithDebInfo" "-DCMAKE_EXPORT_COMPILE_COMMANDS=On" \
+        --cmake-args "-DCMAKE_BUILD_TYPE=Release" \
         -Wall -Wextra -Wpedantic
 source install/setup.bash
 . install/setup.bash

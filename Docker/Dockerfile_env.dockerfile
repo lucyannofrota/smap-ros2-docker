@@ -59,14 +59,12 @@ RUN apt-get update && apt-get install -y \
     curl \
     gnupg2 \
     lsb-release \
-    sudo \
   && curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg \
   && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null \
   && apt-get update && apt-get install -y \
-    ros-${ROS_DISTRO}-ros-desktop \
+    ros-${ROS_DISTRO}-desktop \
     python3-argcomplete \
-    ros-${ROS_DISTRO}-${RMW_IMPLEMENTATION_INSTALL} \ 
-  && rm -rf /var/lib/apt/lists/*
+    ros-${ROS_DISTRO}-${RMW_IMPLEMENTATION_INSTALL}
 
 ENV ROS_DISTRO=${ROS_DISTRO}
 ENV AMENT_PREFIX_PATH=/opt/ros/${ROS_DISTRO}
@@ -208,10 +206,11 @@ RUN sudo apt-get -y install --no-install-recommends \
 	ros-${ROS_DISTRO}-navigation2 \
 	ros-${ROS_DISTRO}-nav2-bringup \
 	ros-${ROS_DISTRO}-dynamixel-sdk \
-	ros-${ROS_DISTRO}-turtlebot3*
+	ros-${ROS_DISTRO}-turtlebot3* \
+        ros-${ROS_DISTRO}-slam-toolbox
   
-RUN echo "export TURTLEBOT3_MODEL=burger" >> /home/$USERNAME/.bashrc \
-	&& echo "export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:${WORKSPACE}/src/turtlebot3/turtlebot3/turtlebot3_simulations/turtlebot3_gazebo/models" >> /home/$USERNAME/.bashrc
+RUN echo "export TURTLEBOT3_MODEL=burger" >> /home/$USERNAME/.bashrc >> /home/$USERNAME/.bashrc
+	# && echo "export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:${WORKSPACE}/src/turtlebot3/turtlebot3/turtlebot3_simulations/turtlebot3_gazebo/models" >> /home/$USERNAME/.bashrc
 
 ENV DEBIAN_FRONTEND=dialog
 
@@ -236,11 +235,11 @@ RUN echo "source ${WORKSPACE}/install/setup.bash" >> /home/$USERNAME/.bashrc \
 	&& echo "# export RCUTILS_CONSOLE_OUTPUT_FORMAT=\"[{severity}] [{name}]: {message} ({function_name}() at {file_name}:{line_number}) [{time}]\""  >> /home/$USERNAME/.bashrc \
 	&& echo "# export RCUTILS_CONSOLE_OUTPUT_FORMAT=\"[{severity}] [{name}]: {message}\""  >> /home/$USERNAME/.bashrc \ 
   && vcs import < src/ros2.repos src \ 
-  && sed -i '2,5d' src/turtlebot3/turtlebot3.repos \
-  && vcs import < src/turtlebot3/turtlebot3.repos src \ 
-  && vcs import < src/turtlebot3/turtlebot3_ci.repos src \ 
   && ./scripts/setup.bash \ 
   && ./scripts/full_build.bash
+#   && sed -i '2,5d' src/turtlebot3/turtlebot3.repos \
+#   && vcs import < src/turtlebot3/turtlebot3.repos src \ 
+#   && vcs import < src/turtlebot3/turtlebot3_ci.repos src \ 
 
 # TODO: Include git repo to build smap pkgs
 

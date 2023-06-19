@@ -135,6 +135,7 @@ WORKDIR ${WORKSPACE}/src
 #&& git clone --recursive https://github.com/lucyannofrota/smap_sampler.git
 #&& git clone --recursive https://github.com/lucyannofrota/smap_interfaces.git
 RUN git clone --recursive https://github.com/stereolabs/zed-ros2-wrapper.git
+# TODO: Change zed wrapper to vcs repos. Use jetson version
 
 WORKDIR ${WORKSPACE}
 

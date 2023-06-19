@@ -3,15 +3,20 @@
 
 repositories:
 
-  turtlebot3:
+  slam_toolbox:
     type: git
-    url: https://github.com/ROBOTIS-GIT/turtlebot3.git
+    url: https://github.com/lucyannofrota/slam_toolbox.git
     version: foxy-devel
 
-  zed-ros2-interfaces:
-    type: git
-    url: https://github.com/stereolabs/zed-ros2-interfaces.git
-    version: foxy-humble-v3.8
+  # turtlebot3:
+  #   type: git
+  #   url: https://github.com/ROBOTIS-GIT/turtlebot3.git
+  #   version: foxy-devel
+
+  # zed-ros2-interfaces:
+  #   type: git
+  #   url: https://github.com/stereolabs/zed-ros2-interfaces.git
+  #   version: foxy-humble-v3.8
 
   #smap:
   #  type: git

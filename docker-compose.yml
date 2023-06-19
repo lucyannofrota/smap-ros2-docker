@@ -13,7 +13,7 @@ services:
       #test: ["CMD-SHELL", "ps -a | grep -q smap_sampler"]
       #bash -c ""
       #test: ["CMD-SHELL", ". /workspace/install/setup.bash; ros2 node list | grep -q /smap_sampler_node"]
-      test: ["CMD", "bash", "-c", ". /workspace/install/setup.bash; ros2 node list | grep -q /smap_sampler_node"]
+      test: ["CMD", "bash", "-c", "./workspace/install/setup.bash; ros2 node list | grep -q /smap/sampler_node"]
       start_period: 1m
       interval: 5s
       timeout: 1s
@@ -63,7 +63,7 @@ services:
     command: >
       bash -c "
         ros2 launch zed_wrapper zed2.launch.py config_path:=/workspace/config/p3dx.yaml publish_tf:=false cam_pose:=[0.0,0.0,0.91,0.0,0.0,0.0] & 
-        (sleep 20 && ros2 run smap_sampler smap_sampler_node)
+        (sleep 30 && ros2 launch smap_sampler sampler_launch.py)
       "
     #RMW_IMPLEMENTATION=rmw_cyclonedds_cpp ROS_DOMAIN_ID=7 ros2 launch zed_wrapper zed2.launch.py publish_tf:=false & RMW_IMPLEMENTATION=rmw_cyclonedds_cpp ROS_DOMAIN_ID=7 ros2 run smap_sampler smap_sampler_node
 
@@ -89,7 +89,6 @@ services:
       network: host
       context: .
       dockerfile: ./Docker/Dockerfile_env.dockerfile
-      #target: test
       args:
         # Base Image
         IMAGE_NAME: nvidia/cudagl:11.4.2-devel-ubuntu20.04
@@ -121,6 +120,7 @@ services:
       #- ./src:/workspace/src
       - ./src/smap/smap_core:/workspace/src/smap/smap_core
       - ./src/smap/smap_interfaces:/workspace/src/smap/smap_interfaces
+      - ./src/slam_toolbox:/workspace/src/slam_toolbox
       - ./scripts:/workspace/scripts
       - ./Docker:/workspace/Docker
     cap_add:
@@ -128,9 +128,12 @@ services:
     command: >
       bash -c 
       "
-        ros2 run smap_core perception_server_node.py && 
-        tail -F /dev/null
+        (
+          tail -F /dev/null
+        )
       "
+    # ros2 run smap_core perception_server_node.py
+  # (git clone --recursive https://github.com/ocornut/imgui.git imgui)
     #ros2 run smap_core classification_component_node.py ;
     deploy:
       resources:
@@ -229,8 +232,10 @@ services:
       - ./src/smap/smap_yolo_v5:/workspace/src/smap/smap_yolo_v5
     cap_add:
       - SYS_PTRACE
-    command: > 
-      bash -c "tail -F /dev/null"
+    command: >
+      bash -c "
+        tail -f /dev/null
+      "
     deploy:
       resources:
         reservations:
@@ -251,9 +256,9 @@ services:
       interval: 5s
       timeout: 1s
       retries: 300
-    depends_on:
-      ros2-zed:
-        condition: service_healthy
+    # depends_on:
+    #   ros2-zed:
+    #     condition: service_healthy
     build:
       network: host
       context: .
@@ -306,8 +311,11 @@ services:
       - SYS_PTRACE
     command: >
       bash -c "
+        . /workspace/install/setup.bash && 
         tail -F /dev/null
       "
+
+    # ros2 launch smap_yolo_v5 yolov5_launch.py
 
     # ros2 launch smap_yolo_v5 yolov5_launch.py
 

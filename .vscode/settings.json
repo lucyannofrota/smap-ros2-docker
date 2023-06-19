@@ -112,6 +112,7 @@
     "cSpell.words": [
         "athackst",
         "autopep",
+        "bigendian",
         "bringup",
         "cmake",
         "cppcheck",
@@ -121,6 +122,8 @@
         "devcontainer",
         "epair",
         "iarchive",
+        "idxs",
+        "imgsz",
         "ints",
         "noqa",
         "pytest",
@@ -132,15 +135,18 @@
         "rosidl",
         "RTPS",
         "rviz",
+        "smap",
         "SMAP",
         "Topo",
         "TOPOLOGIC",
         "Tpng",
         "uncrustify",
+        "unpad",
         "Wextra",
         "Wpedantic",
-        "xmllint"
-    ],
+        "xmllint",
+        "xyzrgba"
+],
     "cSpell.allowCompoundWords": true,
     "cSpell.ignorePaths": [
         "**/package-lock.json",
