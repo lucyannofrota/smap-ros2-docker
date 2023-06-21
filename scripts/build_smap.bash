@@ -43,12 +43,53 @@ do
         PKG_LIST=("${PKG_LIST[@]/$del}")
 done
 
+debug=false
+while getopts d flag
+do
+    case "${flag}" in
+            d) debug=true ;;
+            *) echo "Invalid option: -$flag" ;;
+    esac
+done
+
+if $debug
+then
+    echo "Debug build"
+    colcon build \
+        --merge-install \
+        --symlink-install \
+        --continue-on-error \
+        --event-handlers console_cohesion+ \
+        --base-paths /workspace \
+        --packages-select ${PKG_LIST[@]} \
+        --cmake-args "-DCMAKE_BUILD_TYPE=Debug" \
+        -Wall -Wextra -Wpedantic
+else
+    echo "Release build"
+    colcon build \
+        --merge-install \
+        --symlink-install \
+        --continue-on-error \
+        --event-handlers console_cohesion+ \
+        --base-paths /workspace \
+        --packages-select ${PKG_LIST[@]} \
+        --cmake-args "-DCMAKE_BUILD_TYPE=Release" \
+        -Wall -Wextra -Wpedantic
+fi
+
 colcon build \
         --merge-install \
         --symlink-install \
         --continue-on-error \
+        --event-handlers console_cohesion+ \
+        --base-paths /workspace \
         --packages-select ${PKG_LIST[@]} \
         --cmake-args "-DCMAKE_BUILD_TYPE=Release" \
         -Wall -Wextra -Wpedantic
 source install/setup.bash
 . install/setup.bash
+
+# RelWithDebInfo
+# Release
+# Debug
+# --allow-overriding slam_toolbox \
