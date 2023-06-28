@@ -227,10 +227,6 @@ ENV QT_X11_NO_MITSHM 1
 
 FROM nvidia as ml-torch
 
-RUN pip install torch==${PYTORCH}+${TORCH_CUDA} torchvision==${TORCH_VISION}+${TORCH_CUDA} torchaudio==${TORCH_AUDIO} --extra-index-url https://download.pytorch.org/whl/cu113
-# pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113
-# pip install --dry-run torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113
-
 ENV TORCH_VERSION=1.12.1
 ENV TORCH_VISION_VERSION=0.13.1
 ENV TORCH_AUDIO_VERSION=0.12.1
@@ -238,10 +234,15 @@ ENV TORCH_AUDIO_VERSION=0.12.1
 ENV cudnn_version=8.4.3.1
 ENV cuda_version=cuda11.4
 
+RUN pip install torch==${PYTORCH}+${TORCH_CUDA} torchvision==${TORCH_VISION}+${TORCH_CUDA} torchaudio==${TORCH_AUDIO} --extra-index-url https://download.pytorch.org/whl/cu113
+# pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113
+# pip install --dry-run torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113
+
+
 # Install TensorRT
-RUN python3 -m pip install --upgrade tensorrt
-#RUN python3 -m pip install --upgrade tensorrt_lean \
-#  && python3 -m pip install --upgrade tensorrt_dispatch
+RUN python3 -m pip install --upgrade pip==21 tensorrt==8.6.1
+
+RUN apt-get install -q -y ros-${ROS_DISTRO}-cv-bridge
 
 FROM ml-torch as yolo-v5
 

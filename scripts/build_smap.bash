@@ -77,15 +77,15 @@ else
         -Wall -Wextra -Wpedantic
 fi
 
-colcon build \
-        --merge-install \
-        --symlink-install \
-        --continue-on-error \
-        --event-handlers console_cohesion+ \
-        --base-paths /workspace \
-        --packages-select ${PKG_LIST[@]} \
-        --cmake-args "-DCMAKE_BUILD_TYPE=Release" \
-        -Wall -Wextra -Wpedantic
+# colcon build \
+#         --merge-install \
+#         --symlink-install \
+#         --continue-on-error \
+#         --event-handlers console_cohesion+ \
+#         --base-paths /workspace \
+#         --packages-select ${PKG_LIST[@]} \
+#         --cmake-args "-DCMAKE_BUILD_TYPE=Release" \
+#         -Wall -Wextra -Wpedantic
 source install/setup.bash
 . install/setup.bash
 

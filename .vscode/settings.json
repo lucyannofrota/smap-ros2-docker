@@ -127,6 +127,7 @@
         "ints",
         "noqa",
         "pytest",
+        "Quaternionf",
         "rclcpp",
         "rclpy",
         "repos",

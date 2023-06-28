@@ -120,7 +120,7 @@ services:
       #- ./src:/workspace/src
       - ./src/smap/smap_core:/workspace/src/smap/smap_core
       - ./src/smap/smap_interfaces:/workspace/src/smap/smap_interfaces
-      - ./src/slam_toolbox:/workspace/src/slam_toolbox
+      # - ./src/slam_toolbox:/workspace/src/slam_toolbox
       - ./scripts:/workspace/scripts
       - ./Docker:/workspace/Docker
     cap_add:
@@ -262,7 +262,7 @@ services:
     build:
       network: host
       context: .
-      #target: ml-torch
+      # target: nvidia
       target: yolo-v5
       dockerfile: ./Docker/Dockerfile_torch.dockerfile
       args:
@@ -311,6 +311,7 @@ services:
       - SYS_PTRACE
     command: >
       bash -c "
+        tail -f /dev/null &&
         . /workspace/install/setup.bash && 
         tail -F /dev/null
       "

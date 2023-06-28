@@ -206,10 +206,9 @@ RUN sudo apt-get -y install --no-install-recommends \
 	ros-${ROS_DISTRO}-navigation2 \
 	ros-${ROS_DISTRO}-nav2-bringup \
 	ros-${ROS_DISTRO}-dynamixel-sdk \
-	ros-${ROS_DISTRO}-turtlebot3* \
-        ros-${ROS_DISTRO}-slam-toolbox
+	ros-${ROS_DISTRO}-turtlebot3*
   
-RUN echo "export TURTLEBOT3_MODEL=burger" >> /home/$USERNAME/.bashrc >> /home/$USERNAME/.bashrc
+# RUN echo "export TURTLEBOT3_MODEL=burger" >> /home/$USERNAME/.bashrc >> /home/$USERNAME/.bashrc
 	# && echo "export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:${WORKSPACE}/src/turtlebot3/turtlebot3/turtlebot3_simulations/turtlebot3_gazebo/models" >> /home/$USERNAME/.bashrc
 
 ENV DEBIAN_FRONTEND=dialog
@@ -219,7 +218,8 @@ FROM full-ros-nvidia-gazebo-turtlebot3 as env_setup
 ENV RCUTILS_LOGGING_USE_STDOUT=1
 ENV RCUTILS_LOGGING_BUFFERED_STREAM=1
 ENV RCUTILS_COLORIZED_OUTPUT=1
-ENV TURTLEBOT3_MODEL=burger
+ENV TURTLEBOT3_MODEL=waffle
+ENV GAZEBO_MODEL_PATH=/opt/ros/foxy/share/turtlebot3_gazebo/models
 
 
 WORKDIR ${WORKSPACE}
@@ -227,7 +227,8 @@ COPY ${ENTRYPOINT_HOST_PATH} /sbin/entrypoint.bash
 COPY /scripts ${WORKSPACE}/scripts
 COPY /src/ros2.repos ${WORKSPACE}/src/ros2.repos
 
-RUN chown -R ${USERNAME} ${WORKSPACE}
+RUN chown -R ${USERNAME} ${WORKSPACE} \
+        && sed -i 's/differential/nav2_amcl::DifferentialMotionModel/g' /opt/ros/foxy/share/turtlebot3_navigation2/param/waffle.yaml
 
 USER ${USERNAME}
 

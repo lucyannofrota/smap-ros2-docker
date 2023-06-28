@@ -134,7 +134,13 @@ WORKDIR ${WORKSPACE}/src
 # TODO: Change to vcs repos
 #&& git clone --recursive https://github.com/lucyannofrota/smap_sampler.git
 #&& git clone --recursive https://github.com/lucyannofrota/smap_interfaces.git
-RUN git clone --recursive https://github.com/stereolabs/zed-ros2-wrapper.git
+RUN apt-get update && apt-get install -y \
+  git \
+  python3-pip \
+  python3-vcstool \
+  && printf "# List of repositories to use within your workspace\r# See https://github.com/dirk-thomas/vcstool\rrepositories:\r  zed-ros2-wrapper:\r    type: git\r    url: https://github.com/stereolabs/zed-ros2-wrapper.git\r    version: 8d377ba\r  zed-ros2-interfaces:\r    type: git\r    url: https://github.com/stereolabs/zed-ros2-interfaces.git\r    version: f1517b1\r  nmea_msgs:\r    type: git\r    url: https://github.com/ros-drivers/nmea_msgs.git\r    version: ros2\r  geographic_info:\r    type: git\r    url: https://github.com/ros-geographic-info/geographic_info.git\r    version: ros2\r  angles:\r    type: git\r    url: https://github.com/ros/angles.git\r    version: ros2\r  robot_localization:\r    type: git\r    url: https://github.com/cra-ros-pkg/robot_localization.git\r    version: foxy-devel" > /workspace/zed_foxy.repos \
+  && vcs import < /workspace/zed_foxy.repos
+# RUN git clone --recursive https://github.com/stereolabs/zed-ros2-wrapper.git
 # TODO: Change zed wrapper to vcs repos. Use jetson version
 
 WORKDIR ${WORKSPACE}
