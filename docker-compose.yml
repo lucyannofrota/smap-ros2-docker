@@ -9,6 +9,7 @@ services:
     privileged: true
     depends_on:
       - p3dx
+      - p3dx-navigation
     environment:
       - "ROS_DOMAIN_ID=5"
     volumes:
@@ -17,6 +18,7 @@ services:
       # - /mnt/chopin_02/smap/interfaces:/workspace/src/smap/interfaces
     command: >
       bash -c "
+        sleep 60 &&
         . install/setup.bash && 
         tail -f /dev/null
       "
@@ -32,23 +34,6 @@ services:
   # (while [[ -z "${STP2}" ]]; do echo "waiting"; sleep 1; done) & (sleep 2 && export STP2=1)
   # (while [[ "${STP}" != "0" ]]; do echo "waiting"; sleep 1; done) & (sleep 2 && export STP2=1)
   # (while [[ "${STP}" -ne "1" ]]; do echo "waiting"; sleep 1; source step.init; done) & (sleep 5 && echo export STP=1 > step.init)
-  smap-sampler-zed:
-    network_mode: "host"
-    image: lucyannofrota/smap:jetson-sampler-zed
-    container_name: smap-sampler-zed
-    privileged: true
-    # depends_on:
-    #   - smap-env
-    environment:
-      - "ROS_DOMAIN_ID=5"
-    volumes:
-      - /mnt/chopin_02/container_files/rosbags:/workspace/rosbags
-    command: >
-      bash -c "
-          . install/setup.bash && 
-          (ros2 launch zed_wrapper zed2.launch.py config_path:=/workspace/config/p3dx.yaml publish_tf:=false cam_pose:=[0.10,0.0,0.84,0.0,0.0,0.0]) &&
-          (sleep 30 && ros2 launch smap_sampler sampler_launch.py)
-      "
 
     # bash -c "
     #     . install/setup.bash && 
@@ -72,7 +57,7 @@ services:
 
 
   p3dx:
-    image: lucyannofrota/p3dx:noetic-foxy
+    image: lucyannofrota/p3dx-noetic-foxy
     container_name: p3dx
     network_mode: "host"
     privileged: true
@@ -86,11 +71,16 @@ services:
     cap_add:
       - SYS_PTRACE
     command: >
-      bash -c "
+      bash -c "    
         (. noetic/devel/setup.bash && roscore) &
         (sleep 15 && . noetic/devel/setup.bash && rosparam load noetic/config/ros1_bridge.yaml && roslaunch p3dx_bringup p3dx_bringup.launch) & 
-        (sleep 45 && . foxy/install/setup.bash && ros2 run ros1_bridge parameter_bridge)  
+        (sleep 25 && . foxy/install/setup.bash && ros2 run ros1_bridge parameter_bridge)
       "
+    # (sleep 10 && . noetic/devel/setup.bash && rosparam load noetic/config/ros1_bridge.yaml && roslaunch p3dx_bringup p3dx_bringup.launch) & 
+    # (sleep 25 && . foxy/install/setup.bash && ros2 run ros1_bridge parameter_bridge)  
+
+    # ros2 launch p3dx_bringup bringup_slam_launch.py
+
   p3dx-navigation:
     network_mode: "host"
     image: lucyannofrota/p3dx:navigation
@@ -102,12 +92,51 @@ services:
       - "ROS_DOMAIN_ID=5"
     volumes:
       - /mnt/chopin_02/container_files/rosbags:/workspace/rosbags
-      # - /mnt/chopin_02/smap/smap_core:/workspace/src/smap/smap_core
-      # - /mnt/chopin_02/smap/interfaces:/workspace/src/smap/interfaces
     command: >
       bash -c "
-        . install/setup.bash && ros2 launch p3dx_bringup bringup_slam_launch.py
+        tail -f /dev/null
       "
+    # sleep 40 && . install/setup.bash && ros2 launch p3dx_bringup bringup_slam_launch.py
+    # tail -f /dev/null
+
+  smap-sampler:
+    network_mode: "host"
+    image: lucyannofrota/smap:jetson-sampler-zed
+    container_name: smap-sampler-zed
+    privileged: true
+    depends_on:
+      - p3dx-navigation
+    environment:
+      - "ROS_DOMAIN_ID=5"
+    volumes:
+      - /mnt/chopin_02/container_files/rosbags:/workspace/rosbags
+    command: >
+      bash -c "
+        . install/setup.bash && 
+        (
+          (ros2 launch zed_wrapper zed2.launch.py config_path:=/workspace/config/p3dx.yaml publish_tf:=false cam_pose:=[0.10,0.0,0.84,0.0,0.0,0.0]) & configs:
+          (ros2 launch smap_sampler sampler_launch.py)
+        )
+      "
+  # (sleep 40 && . install/setup.bash && ros2 launch smap_sampler sampler_launch.py)
+
+  smap-yolov5:
+    network_mode: "host"
+    image: lucyannofrota/smap:jetson-yolov5
+    container_name: jetson-yolov5
+    shm_size: '8gb' # <-- when RUNNING 
+    privileged: true
+    depends_on:
+      - smap-sampler
+    environment:
+      - "ROS_DOMAIN_ID=5"
+    cap_add:
+      - SYS_PTRACE
+    command: >
+      bash -c "
+        tail -f /dev/null
+      "
+    # ros2 launch smap_yolo_v5 yolov5_launch.py
 
   # noetic:
   #   image: p3dx:noetic
