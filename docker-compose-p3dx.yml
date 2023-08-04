@@ -1,0 +1,41 @@
+version: '2.2'
+
+services:
+
+  p3dx:
+    image: lucyannofrota/p3dx-noetic-foxy
+    container_name: p3dx
+    network_mode: "host"
+    privileged: true
+    environment:
+      - "DISPLAY"
+      - "QT_X11_NO_MITSHM=1" #fix some QT bugs
+      - "ROS_DOMAIN_ID=5"
+    volumes: 
+      - /tmp/.X11-unix:/tmp/.X11-unix # Share X11 socket with container
+      - $HOME/.Xauthority:/home/ros/.Xauthority # Share X11 permissions
+    cap_add:
+      - SYS_PTRACE
+    command: >
+      bash -c "    
+        (. noetic/devel/setup.bash && roscore) &
+        (sleep 15 && . noetic/devel/setup.bash && rosparam load noetic/config/ros1_bridge.yaml && roslaunch p3dx_bringup p3dx_bringup.launch) & 
+        (sleep 25 && . foxy/install/setup.bash && ros2 run ros1_bridge parameter_bridge)
+      "
+
+  p3dx-navigation:
+    network_mode: "host"
+    image: lucyannofrota/p3dx-navigation
+    container_name: p3dx-navigation
+    privileged: true
+    depends_on:
+      - p3dx
+    environment:
+      - "ROS_DOMAIN_ID=5"
+    volumes:
+      - /mnt/chopin_02/container_files/rosbags:/workspace/rosbags
+    command: >
+      bash -c "
+        sleep 40 && . install/setup.bash && ros2 launch p3dx_bringup bringup_slam_launch.py
+      "
+      

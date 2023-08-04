@@ -83,7 +83,7 @@ services:
 
   p3dx-navigation:
     network_mode: "host"
-    image: lucyannofrota/p3dx:navigation
+    image: lucyannofrota/p3dx-navigation
     container_name: p3dx-navigation
     privileged: true
     depends_on:
@@ -94,7 +94,7 @@ services:
       - /mnt/chopin_02/container_files/rosbags:/workspace/rosbags
     command: >
       bash -c "
-        tail -f /dev/null
+        sleep 40 && . install/setup.bash && ros2 launch p3dx_bringup bringup_slam_launch.py
       "
     # sleep 40 && . install/setup.bash && ros2 launch p3dx_bringup bringup_slam_launch.py
     # tail -f /dev/null
@@ -112,7 +112,7 @@ services:
       - /mnt/chopin_02/container_files/rosbags:/workspace/rosbags
     command: >
       bash -c "
-        . install/setup.bash && 
+        sleep 40 && . install/setup.bash && 
         (
           (ros2 launch zed_wrapper zed2.launch.py config_path:=/workspace/config/p3dx.yaml publish_tf:=false cam_pose:=[0.10,0.0,0.84,0.0,0.0,0.0]) & configs:
           (ros2 launch smap_sampler sampler_launch.py)
@@ -134,61 +134,9 @@ services:
       - SYS_PTRACE
     command: >
       bash -c "
-        tail -f /dev/null
+        . install/setup.bash && ros2 launch smap_yolo_v5 yolov5_launch.py
       "
     # ros2 launch smap_yolo_v5 yolov5_launch.py
+    # tail -f /dev/null
 
-  # noetic:
-  #   image: p3dx:noetic
-  #   container_name: noetic
-  #   extends:
-  #     file: docker-compose-p3dx.yml
-  #     service: noetic
-  #   network_mode: "host"
-  #   privileged: true
-  #   environment:
-  #     - "DISPLAY"
-  #     - "QT_X11_NO_MITSHM=1" #fix some QT bugs
-  #   volumes: 
-  #     - /tmp/.X11-unix:/tmp/.X11-unix # Share X11 socket with container
-  #     - $HOME/.Xauthority:/home/ros/.Xauthority # Share X11 permissions
-  #   cap_add:
-  #     - SYS_PTRACE
-  #   command: bash -c "tail -F /dev/null"
-  
-  # p3dx_noetic:
-  #   image: p3dx:noetic-drivers
-  #   container_name: p3dx-noetic
-  #   extends:
-  #     file: docker-compose-p3dx.yml
-  #     service: p3dx_noetic
-  #   network_mode: "host"
-  #   privileged: true
-  #   environment:
-  #     - "DISPLAY"
-  #     - "QT_X11_NO_MITSHM=1" #fix some QT bugs
-  #   volumes: 
-  #     - /tmp/.X11-unix:/tmp/.X11-unix # Share X11 socket with container
-  #     - $HOME/.Xauthority:/home/ros/.Xauthority # Share X11 permissions
-  #   cap_add:
-  #     - SYS_PTRACE
-  #   command: bash -c "tail -F /dev/null"
-
-  # noetic_foxy:
-  #   image: p3dx:noetic-foxy
-  #   container_name: noetic-foxy
-  #   extends:
-  #     file: docker-compose-p3dx.yml
-  #     service: noetic_foxy
-  #   network_mode: "host"
-  #   privileged: true
-  #   environment:
-  #     - "DISPLAY"
-  #     - "QT_X11_NO_MITSHM=1" #fix some QT bugs
-  #   volumes: 
-  #     - /tmp/.X11-unix:/tmp/.X11-unix # Share X11 socket with container
-  #     - $HOME/.Xauthority:/home/ros/.Xauthority # Share X11 permissions
-  #   cap_add:
-  #     - SYS_PTRACE
-  #   command: bash -c "tail -F /dev/null"
-  
+    
