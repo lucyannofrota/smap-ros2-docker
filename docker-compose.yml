@@ -18,9 +18,9 @@ services:
       interval: 5s
       timeout: 1s
       retries: 300
-    depends_on:
-      ros2-env:
-        condition: service_healthy
+    # depends_on:
+    #   ros2-env:
+    #     condition: service_healthy
     build:
       network: host
       context: .
@@ -55,6 +55,7 @@ services:
       #https://linuxconfig.org/how-to-move-docker-s-default-var-lib-docker-to-another-directory-on-ubuntu-debian-linux
       # sudo mount --rbind /mnt/docker /var/lib/docker
     volumes: 
+      - /var/run/docker.sock:/var/run/docker.sock
       - ./src/smap/smap_interfaces:/workspace/src/smap/smap_interfaces
       - ./src/smap/smap_sampler:/workspace/src/smap/smap_sampler
 
@@ -115,6 +116,7 @@ services:
       - "DISPLAY"
       - "QT_X11_NO_MITSHM=1" #fix some QT bugs
     volumes: 
+      - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/.X11-unix:/tmp/.X11-unix # Share X11 socket with container
       - $HOME/.Xauthority:/home/ros/.Xauthority # Share X11 permissions
       #- ./src:/workspace/src
@@ -122,6 +124,7 @@ services:
       - ./src/smap/smap_interfaces:/workspace/src/smap/smap_interfaces
       # - ./src/slam_toolbox:/workspace/src/slam_toolbox
       - ./scripts:/workspace/scripts
+      - ./aux:/workspace/aux
       - ./Docker:/workspace/Docker
     cap_add:
       - SYS_PTRACE
@@ -158,6 +161,7 @@ services:
       - "QT_X11_NO_MITSHM=1" #fix some QT bugs
       - "ROS_DOMAIN_ID=5"
     volumes: 
+      - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/.X11-unix:/tmp/.X11-unix # Share X11 socket with container
       - $HOME/.Xauthority:/home/ros/.Xauthority # Share X11 permissions
       - ./src/smap/smap_core:/workspace/src/smap/smap_core
@@ -225,6 +229,7 @@ services:
       - "DISPLAY"
       - "QT_X11_NO_MITSHM=1" #fix some QT bugs
     volumes: 
+      - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/.X11-unix:/tmp/.X11-unix # Share X11 socket with container
       - $HOME/.Xauthority:/home/ros/.Xauthority # Share X11 permissions
       - ./src/smap/smap_interfaces:/workspace/src/smap/smap_interfaces
@@ -301,6 +306,7 @@ services:
       - "DISPLAY"
       - "QT_X11_NO_MITSHM=1" #fix some QT bugs
     volumes: 
+      - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/.X11-unix:/tmp/.X11-unix # Share X11 socket with container
       - $HOME/.Xauthority:/home/ros/.Xauthority # Share X11 permissions
       - ./src/smap/smap_interfaces:/workspace/src/smap/smap_interfaces

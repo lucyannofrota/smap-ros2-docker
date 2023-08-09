@@ -25,3 +25,5 @@ delete_tmp_modules/
 frames.gv
 
 frames.pdf
+
+aux/
