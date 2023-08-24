@@ -22,6 +22,7 @@ services:
           devices:
             - driver: nvidia
               capabilities: [gpu]
+    restart: unless-stopped
     command: >
       bash -c "
         tail -f /dev/null
@@ -44,6 +45,7 @@ services:
           devices:
             - driver: nvidia
               capabilities: [gpu]
+    restart: unless-stopped
     command: >
       bash -c "
         sleep 40 && . install/setup.bash && 
@@ -71,7 +73,9 @@ services:
           devices:
             - driver: nvidia
               capabilities: [gpu]
+    restart: unless-stopped
     command: >
       bash -c "
         . install/setup.bash && ros2 launch smap_yolo_v5 yolov5_launch.py
       "
+    # . install/setup.bash && (ros2 launch smap_yolo_v5 yolov5_even_launch.py & ros2 launch smap_yolo_v5 yolov5_odd_launch.py)

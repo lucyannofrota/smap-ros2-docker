@@ -36,6 +36,7 @@ services:
       - "ROS_DOMAIN_ID=5"
     volumes:
       - /mnt/chopin_02/container_files/rosbags:/workspace/rosbags
+    restart: unless-stopped
     command: >
       bash -c "
         sleep 40 && . install/setup.bash && ros2 launch p3dx_bringup bringup_slam_launch.py
