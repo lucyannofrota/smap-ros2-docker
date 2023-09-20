@@ -11,8 +11,13 @@ services:
       - p3dx
       - p3dx-navigation
     environment:
+      - "DISPLAY"
+      - "QT_X11_NO_MITSHM=1" #fix some QT bugs
       - "ROS_DOMAIN_ID=5"
     volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/.X11-unix:/tmp/.X11-unix # Share X11 socket with container
+      - $HOME/.Xauthority:/home/ros/.Xauthority # Share X11 permissions
       - /mnt/chopin_02/container_files/rosbags:/workspace/rosbags
       - /mnt/chopin_02/smap/smap_core:/workspace/src/smap/smap_core
       - /mnt/chopin_02/smap/smap_interfaces:/workspace/src/smap/smap_interfaces
@@ -30,7 +35,8 @@ services:
 
   smap-sampler:
     network_mode: "host"
-    image: lucyannofrota/smap:jetson-sampler-zed
+    # image: lucyannofrota/smap:jetson-sampler-zed
+    image: lucyannofrota/smap:jetson-sampler-zed-alpha
     container_name: smap-sampler-zed
     privileged: true
     depends_on:
@@ -57,7 +63,8 @@ services:
 
   smap-yolov5:
     network_mode: "host"
-    image: lucyannofrota/smap:jetson-yolov5
+    # image: lucyannofrota/smap:jetson-yolov5
+    image: lucyannofrota/smap:jetson-yolov5-alpha
     container_name: jetson-yolov5
     shm_size: '8gb' # <-- when RUNNING 
     privileged: true
