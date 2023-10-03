@@ -115,7 +115,7 @@ services:
     environment:
       - "DISPLAY"
       - "QT_X11_NO_MITSHM=1" #fix some QT bugs
-    volumes: 
+    volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/.X11-unix:/tmp/.X11-unix # Share X11 socket with container
       - $HOME/.Xauthority:/home/ros/.Xauthority # Share X11 permissions
@@ -126,6 +126,7 @@ services:
       - ./scripts:/workspace/scripts
       - ./aux:/workspace/aux
       - ./Docker:/workspace/Docker
+      # - ./src/P3DX:/workspace/src/P3DX
     cap_add:
       - SYS_PTRACE
     command: >
@@ -173,9 +174,9 @@ services:
     command: >
       bash -c 
       "
-        ./scripts/build_smap.bash && 
-        tail -F /dev/null
+        tail -f /dev/null
       "
+    # entrypoint: "tail -f /dev/null"
     #ros2 run smap_core classification_component_node.py ;
     deploy:
       resources:
