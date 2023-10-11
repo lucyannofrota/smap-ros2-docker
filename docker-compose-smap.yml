@@ -21,6 +21,9 @@ services:
       - /mnt/chopin_02/container_files/rosbags:/workspace/rosbags
       - /mnt/chopin_02/smap/smap_core:/workspace/src/smap/smap_core
       - /mnt/chopin_02/smap/smap_interfaces:/workspace/src/smap/smap_interfaces
+      - /mnt/chopin_02/datasets/timers:/workspace/src/smap/smap_core/timers
+      - /mnt/chopin_02/datasets/vals:/workspace/src/smap/smap_core/vals
+      - /mnt/chopin_02/datasets/maps:/workspace/src/smap/smap_core/maps
     deploy:
       resources:
         reservations:
@@ -33,10 +36,38 @@ services:
         tail -f /dev/null
       "
 
+  smap-deploy:
+    network_mode: "host"
+    image: lucyannofrota/smap:jetson-deploy
+    container_name: samp-core
+    privileged: true
+    depends_on:
+      - p3dx
+      - p3dx-navigation
+      - smap-sampler
+    environment:
+      - "DISPLAY"
+      - "QT_X11_NO_MITSHM=1" #fix some QT bugs
+      - "ROS_DOMAIN_ID=5"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/.X11-unix:/tmp/.X11-unix # Share X11 socket with container
+      - $HOME/.Xauthority:/home/ros/.Xauthority # Share X11 permissions
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+    restart: unless-stopped
+    command: >
+      bash -c "
+        . install/setup.bash && ros2 launch smap_node smap_launch.py
+      "
+
   smap-sampler:
     network_mode: "host"
-    # image: lucyannofrota/smap:jetson-sampler-zed
-    image: lucyannofrota/smap:jetson-sampler-zed-alpha
+    image: lucyannofrota/smap:jetson-sampler-zed
     container_name: smap-sampler-zed
     privileged: true
     depends_on:
@@ -63,8 +94,7 @@ services:
 
   smap-yolov5:
     network_mode: "host"
-    # image: lucyannofrota/smap:jetson-yolov5
-    image: lucyannofrota/smap:jetson-yolov5-alpha
+    image: lucyannofrota/smap:jetson-yolov5
     container_name: jetson-yolov5
     shm_size: '8gb' # <-- when RUNNING 
     privileged: true
@@ -72,6 +102,8 @@ services:
       - smap-sampler
     environment:
       - "ROS_DOMAIN_ID=5"
+    volumes:
+      - /mnt/chopin_02/datasets/timers:/workspace/timers
     cap_add:
       - SYS_PTRACE
     deploy:
@@ -85,4 +117,5 @@ services:
       bash -c "
         . install/setup.bash && ros2 launch smap_yolo_v5 yolov5_launch.py
       "
+    # . install/setup.bash && ros2 launch smap_yolo_v5 yolov5_launch.py
     # . install/setup.bash && (ros2 launch smap_yolo_v5 yolov5_even_launch.py & ros2 launch smap_yolo_v5 yolov5_odd_launch.py)
