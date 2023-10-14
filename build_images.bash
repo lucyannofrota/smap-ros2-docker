@@ -38,20 +38,20 @@ compose () {
     printf "\t\t\tElapsed Time: $(($end_var-$start_var)) seconds\n\n" >> logs/build.log
 }
 
-# printf "\tP3-DX:\n\n" >> logs/build.log
+printf "\tP3-DX:\n\n" >> logs/build.log
 
-# compose noetic build:jetson-noetic lucyannofrota/jetson-noetic:alpha
-# compose noetic_foxy build:jetson-noetic-foxy lucyannofrota/jetson-noetic-foxy:alpha
-# compose noetic_p3dx build:p3dx-noetic lucyannofrota/p3dx-noetic:alpha
-# compose noetic_foxy_p3dx build:p3dx-noetic-foxy lucyannofrota/p3dx-noetic-foxy:alpha
-# compose p3dx_navigation build:p3dx-navigation lucyannofrota/p3dx-navigation:alpha
+compose noetic build:jetson-noetic lucyannofrota/jetson-noetic:alpha
+compose noetic_foxy build:jetson-noetic-foxy lucyannofrota/jetson-noetic-foxy:alpha
+compose noetic_p3dx build:p3dx-noetic lucyannofrota/p3dx-noetic:alpha
+compose noetic_foxy_p3dx build:p3dx-noetic-foxy lucyannofrota/p3dx-noetic-foxy:alpha
+compose p3dx_navigation build:p3dx-navigation lucyannofrota/p3dx-navigation:alpha
 
-# printf "\tSMAP:\n\n" >> logs/build.log
+printf "\tSMAP:\n\n" >> logs/build.log
 
-# compose ros2-zed build:zed lucyannofrota/foxy:zed-alpha
-# compose smap-sampler-zed build:jetson-sampler-zed lucyannofrota/smap:jetson-sampler-zed-alpha
-# compose smap-yolov5 build:jetson-yolov5 lucyannofrota/smap:jetson-yolov5-alpha
-# compose smap-env build:jetson-env lucyannofrota/smap:jetson-env-alpha
+compose ros2-zed build:zed lucyannofrota/foxy:zed-alpha
+compose smap-sampler-zed build:jetson-sampler-zed lucyannofrota/smap:jetson-sampler-zed-alpha
+compose smap-yolov5 build:jetson-yolov5 lucyannofrota/smap:jetson-yolov5-alpha
+compose smap-env build:jetson-env lucyannofrota/smap:jetson-env-alpha
 compose smap-deploy build:jetson-deploy lucyannofrota/smap:jetson-deploy-alpha
 
 

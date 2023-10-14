@@ -5,7 +5,7 @@ services:
   smap-env:
     network_mode: "host"
     image: lucyannofrota/smap:jetson-env
-    container_name: samp-env
+    container_name: smap-env
     privileged: true
     depends_on:
       - p3dx
@@ -38,7 +38,7 @@ services:
 
   smap-deploy:
     network_mode: "host"
-    image: lucyannofrota/smap:jetson-deploy
+    image: lucyannofrota/smap:jetson-deploy-latest
     container_name: samp-core
     privileged: true
     depends_on:
@@ -117,5 +117,55 @@ services:
       bash -c "
         . install/setup.bash && ros2 launch smap_yolo_v5 yolov5_launch.py
       "
-    # . install/setup.bash && ros2 launch smap_yolo_v5 yolov5_launch.py
     # . install/setup.bash && (ros2 launch smap_yolo_v5 yolov5_even_launch.py & ros2 launch smap_yolo_v5 yolov5_odd_launch.py)
+  smap-yolov5-even:
+    network_mode: "host"
+    image: lucyannofrota/smap:jetson-yolov5
+    container_name: jetson-yolov5-even
+    shm_size: '8gb' # <-- when RUNNING 
+    privileged: true
+    depends_on:
+      - smap-sampler
+    environment:
+      - "ROS_DOMAIN_ID=5"
+    volumes:
+      - /mnt/chopin_02/datasets/timers:/workspace/timers
+    cap_add:
+      - SYS_PTRACE
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+    restart: unless-stopped
+    command: >
+      bash -c "
+        . install/setup.bash && ros2 launch smap_yolo_v5 yolov5_even_launch.py
+      "
+
+  smap-yolov5-odd:
+    network_mode: "host"
+    image: lucyannofrota/smap:jetson-yolov5
+    container_name: jetson-yolov5-odd
+    shm_size: '8gb' # <-- when RUNNING 
+    privileged: true
+    depends_on:
+      - smap-sampler
+    environment:
+      - "ROS_DOMAIN_ID=5"
+    volumes:
+      - /mnt/chopin_02/datasets/timers:/workspace/timers
+    cap_add:
+      - SYS_PTRACE
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+    restart: unless-stopped
+    command: >
+      bash -c "
+        . install/setup.bash && ros2 launch smap_yolo_v5 yolov5_odd_launch.py
+      "
