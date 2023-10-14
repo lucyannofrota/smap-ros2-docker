@@ -39,7 +39,7 @@ services:
   smap-deploy:
     network_mode: "host"
     image: lucyannofrota/smap:jetson-deploy-latest
-    container_name: samp-core
+    container_name: smap-core
     privileged: true
     depends_on:
       - p3dx
